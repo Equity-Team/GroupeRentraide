@@ -1,3 +1,2580 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:d04a75a31d4cf583b43becf1b553e2e2941ac39e7d8ce17678e5d17d332b0b55
-size 190764
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.21">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Manipulation Tableaux – Initiation à R dans le cadre d'une recherche épidémiologique</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./2.InitiationGraphiques.html" rel="next">
+<link href="./0.Quelquesbases.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea1d7ac60288e0f1efdbc993fd8432ae.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./1.ManipulationTableaux.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Manipulation Tableaux</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Initiation à R dans le cadre d’une recherche épidémiologique</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./0.Quelquesbases.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quelques Bases</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./1.ManipulationTableaux.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Manipulation Tableaux</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./2.InitiationGraphiques.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Initiation Graphiques</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./3.PersonalisationGraphiques.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Personnalisation graphiques avec ggplot2</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./4.PremieresAnalyses.sur.R.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Analyses Bivariées</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./5.RegressionLineaire.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regression Lineaire</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./6.RegressionLogistique.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regression Logistique</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./7.RegressionMultinomialeOrdinale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Régressions multinomiales et ordinales</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./8.Initiation_Fonctions_Boucles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Fonctions, conditions et boucles</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#opérateurs-utiles" id="toc-opérateurs-utiles" class="nav-link active" data-scroll-target="#opérateurs-utiles"><span class="header-section-number">3.1</span> Opérateurs utiles</a>
+  <ul class="collapse">
+  <li><a href="#opérations-sur-les-vecteurs" id="toc-opérations-sur-les-vecteurs" class="nav-link" data-scroll-target="#opérations-sur-les-vecteurs"><span class="header-section-number">3.1.1</span> Opérations sur les vecteurs</a></li>
+  </ul></li>
+  <li><a href="#informations-générales-de-la-base" id="toc-informations-générales-de-la-base" class="nav-link" data-scroll-target="#informations-générales-de-la-base"><span class="header-section-number">3.2</span> Informations générales de la base</a></li>
+  <li><a href="#accès-aux-données-du-tableaux" id="toc-accès-aux-données-du-tableaux" class="nav-link" data-scroll-target="#accès-aux-données-du-tableaux"><span class="header-section-number">3.3</span> Accès aux données du tableaux</a>
+  <ul class="collapse">
+  <li><a href="#en-utilisant-les-indices" id="toc-en-utilisant-les-indices" class="nav-link" data-scroll-target="#en-utilisant-les-indices"><span class="header-section-number">3.3.1</span> En utilisant les indices</a></li>
+  <li><a href="#en-utilisant-le-nom-de-la-colonne" id="toc-en-utilisant-le-nom-de-la-colonne" class="nav-link" data-scroll-target="#en-utilisant-le-nom-de-la-colonne"><span class="header-section-number">3.3.2</span> En utilisant le nom de la colonne</a></li>
+  </ul></li>
+  <li><a href="#supprimer-une-colonne" id="toc-supprimer-une-colonne" class="nav-link" data-scroll-target="#supprimer-une-colonne"><span class="header-section-number">3.4</span> Supprimer une colonne</a>
+  <ul class="collapse">
+  <li><a href="#r-base-1" id="toc-r-base-1" class="nav-link" data-scroll-target="#r-base-1"><span class="header-section-number">3.4.1</span> R base</a></li>
+  <li><a href="#tidyverse-2" id="toc-tidyverse-2" class="nav-link" data-scroll-target="#tidyverse-2"><span class="header-section-number">3.4.2</span> Tidyverse</a></li>
+  </ul></li>
+  <li><a href="#modifications-dans-un-tableau" id="toc-modifications-dans-un-tableau" class="nav-link" data-scroll-target="#modifications-dans-un-tableau"><span class="header-section-number">3.5</span> Modifications dans un tableau</a>
+  <ul class="collapse">
+  <li><a href="#modifier-une-valeur-dun-tableau" id="toc-modifier-une-valeur-dun-tableau" class="nav-link" data-scroll-target="#modifier-une-valeur-dun-tableau"><span class="header-section-number">3.5.1</span> Modifier une valeur d’un tableau</a></li>
+  <li><a href="#modifier-une-colonne-entière" id="toc-modifier-une-colonne-entière" class="nav-link" data-scroll-target="#modifier-une-colonne-entière"><span class="header-section-number">3.5.2</span> Modifier une colonne entière</a></li>
+  <li><a href="#convertir-une-colonne" id="toc-convertir-une-colonne" class="nav-link" data-scroll-target="#convertir-une-colonne"><span class="header-section-number">3.5.3</span> Convertir une colonne</a></li>
+  </ul></li>
+  <li><a href="#créer-une-nouvelle-colonne" id="toc-créer-une-nouvelle-colonne" class="nav-link" data-scroll-target="#créer-une-nouvelle-colonne"><span class="header-section-number">3.6</span> Créer une nouvelle colonne</a>
+  <ul class="collapse">
+  <li><a href="#r-base-3" id="toc-r-base-3" class="nav-link" data-scroll-target="#r-base-3"><span class="header-section-number">3.6.1</span> R base</a></li>
+  <li><a href="#tidyverse-4" id="toc-tidyverse-4" class="nav-link" data-scroll-target="#tidyverse-4"><span class="header-section-number">3.6.2</span> Tidyverse</a></li>
+  </ul></li>
+  <li><a href="#renommer-une-colonne" id="toc-renommer-une-colonne" class="nav-link" data-scroll-target="#renommer-une-colonne"><span class="header-section-number">3.7</span> Renommer une colonne</a>
+  <ul class="collapse">
+  <li><a href="#r-base-4" id="toc-r-base-4" class="nav-link" data-scroll-target="#r-base-4"><span class="header-section-number">3.7.1</span> R base</a></li>
+  <li><a href="#tidyverse-5" id="toc-tidyverse-5" class="nav-link" data-scroll-target="#tidyverse-5"><span class="header-section-number">3.7.2</span> Tidyverse</a></li>
+  </ul></li>
+  <li><a href="#ordonner-la-base-en-fonction-dune-ou-plusieurs-colonnes" id="toc-ordonner-la-base-en-fonction-dune-ou-plusieurs-colonnes" class="nav-link" data-scroll-target="#ordonner-la-base-en-fonction-dune-ou-plusieurs-colonnes"><span class="header-section-number">3.8</span> Ordonner la base en fonction d’une ou plusieurs colonnes</a>
+  <ul class="collapse">
+  <li><a href="#r-base-5" id="toc-r-base-5" class="nav-link" data-scroll-target="#r-base-5"><span class="header-section-number">3.8.1</span> R base</a></li>
+  <li><a href="#tidyverse-6" id="toc-tidyverse-6" class="nav-link" data-scroll-target="#tidyverse-6"><span class="header-section-number">3.8.2</span> Tidyverse</a></li>
+  </ul></li>
+  <li><a href="#connaître-les-différentes-valeurs-prises-par-une-variable" id="toc-connaître-les-différentes-valeurs-prises-par-une-variable" class="nav-link" data-scroll-target="#connaître-les-différentes-valeurs-prises-par-une-variable"><span class="header-section-number">3.9</span> Connaître les différentes valeurs prises par une variable</a></li>
+  <li><a href="#transposer-un-tableau" id="toc-transposer-un-tableau" class="nav-link" data-scroll-target="#transposer-un-tableau"><span class="header-section-number">3.10</span> Transposer un tableau</a>
+  <ul class="collapse">
+  <li><a href="#transformer-des-lignes-en-colonnes---pivot_wider" id="toc-transformer-des-lignes-en-colonnes---pivot_wider" class="nav-link" data-scroll-target="#transformer-des-lignes-en-colonnes---pivot_wider"><span class="header-section-number">3.10.1</span> Transformer des lignes en colonnes - <em>pivot_wider()</em></a></li>
+  <li><a href="#transformer-des-colonnes-en-lignes---pivot_longer" id="toc-transformer-des-colonnes-en-lignes---pivot_longer" class="nav-link" data-scroll-target="#transformer-des-colonnes-en-lignes---pivot_longer"><span class="header-section-number">3.10.2</span> Transformer des colonnes en lignes - <em>pivot_longer()</em></a></li>
+  </ul></li>
+  <li><a href="#travailler-sur-des-données-groupées" id="toc-travailler-sur-des-données-groupées" class="nav-link" data-scroll-target="#travailler-sur-des-données-groupées"><span class="header-section-number">3.11</span> Travailler sur des données groupées</a>
+  <ul class="collapse">
+  <li><a href="#tidyverse-7" id="toc-tidyverse-7" class="nav-link" data-scroll-target="#tidyverse-7"><span class="header-section-number">3.11.1</span> Tidyverse</a></li>
+  <li><a href="#grouper-selon-une-variable" id="toc-grouper-selon-une-variable" class="nav-link" data-scroll-target="#grouper-selon-une-variable"><span class="header-section-number">3.11.2</span> Grouper selon une variable</a></li>
+  <li><a href="#grouper-selon-plusieurs-variables" id="toc-grouper-selon-plusieurs-variables" class="nav-link" data-scroll-target="#grouper-selon-plusieurs-variables"><span class="header-section-number">3.11.3</span> Grouper selon plusieurs variables</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Manipulation Tableaux</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Cette deuxième séance est consacrée à la manipulation des bases de données ouvertes dans le format dataframe. <br> Pour cette séance, nous allons utiliser la base LE_65, qui contient les données Eurostat sur l’espérance de vie à 65 ans en Europe par sexe et années de 2013 à 2021. Vous pouvez la télécharger via le drive.<br> Pour la suite, cette base de données sera stockée dans la variable <em>df</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"DATA/tps00026_LE_65_Eurostat_database.csv"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   DATAFLOW         LAST.UPDATE            freq               unit          
+ Length:1578        Length:1578        Length:1578        Length:1578       
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+     age                sex                geo             TIME_PERIOD  
+ Length:1578        Length:1578        Length:1578        Min.   :2010  
+ Class :character   Class :character   Class :character   1st Qu.:2012  
+ Mode  :character   Mode  :character   Mode  :character   Median :2015  
+                                                          Mean   :2015  
+                                                          3rd Qu.:2018  
+                                                          Max.   :2021  
+   OBS_VALUE       OBS_FLAG        
+ Min.   :11.60   Length:1578       
+ 1st Qu.:17.00   Class :character  
+ Median :18.90   Mode  :character  
+ Mean   :18.64                     
+ 3rd Qu.:20.60                     
+ Max.   :24.00                     </code></pre>
+</div>
+</div>
+<p>Avant de commencer, on charge les packages dont on aura besoin</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co">#contient notamment dplyr et ggplot2</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr) <span class="co"># pour fonction kabble</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="opérateurs-utiles" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="opérateurs-utiles"><span class="header-section-number">3.1</span> Opérateurs utiles</h2>
+<p>Avant toute chose, nous rappelons quelques opérateurs qui nous seront souvent utiles pour manipuler des données <br> <br></p>
+<ul>
+<li>Comparateur d’égalité <em>==</em> : pour tester si deux valeurs sont égales</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">==</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<ul>
+<li>Comparateur de supériorité stricte <em>&gt;</em> : pour tester si une valeur est strictement supérieure à une autre</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">&gt;</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Comparateur de supériorité <em>&gt;=</em> : pour tester si une valeur est supérieure ou égale à une autre</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">&gt;=</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Comparateur d’infériorité stricte <em>&lt;</em> : pour tester si une valeur est strictement inférieure à une autre</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">&lt;</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Comparateur d’infériorité <em>&lt;=</em> : pour tester si une valeur est inférieure ou égale à une autre</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">&lt;=</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Comparateur d’inégalité <em>!=</em> : pour tester si deux valeurs sont différentes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">!=</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p><b>D’une manière générale, la négation dans R se fait avec <em>!</em></b></p>
+<p><span class="math inline">\(\bullet\)</span> Indicateur de présence dans un vecteur <em>%in%</em> : pour tester si une valeur se trouve dans un vecteur</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>Pour tester qu’une valeur ne se trouve pas dans le vecteur, on rajoute la négation</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="sc">!</span>(<span class="dv">2</span> <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Tester si une donnée est une valeur manquante (NA en R) <em>is.na()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.na</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p>De même pour vérifier qu’une donnée n’est pas manquante on ajoute la négation</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="sc">!</span><span class="fu">is.na</span>(<span class="cn">NA</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p>On peut aussi appliquer cette fonction à un vecteur, elle dira alors pour chaque entrée du vecteur si la donnée est manquante ou non</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.na</span>(<span class="fu">c</span>(<span class="dv">14</span>, <span class="dv">5</span>, <span class="cn">NA</span>, <span class="dv">6</span>, <span class="cn">NA</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE FALSE  TRUE FALSE  TRUE</code></pre>
+</div>
+</div>
+<section id="opérations-sur-les-vecteurs" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="opérations-sur-les-vecteurs"><span class="header-section-number">3.1.1</span> Opérations sur les vecteurs</h3>
+<p><span class="math inline">\(\bullet\)</span> Pour définir un vecteur par section on utilise “<em>:</em>”</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2 3 4 5</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour définir un vecteur par section avec un pas spécifié on utilise la fonction <em>seq()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]   1   4   7  10  13  16  19  22  25  28  31  34  37  40  43  46  49  52  55
+[20]  58  61  64  67  70  73  76  79  82  85  88  91  94  97 100</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour définir un vecteur par une répétitions de séquence on utilise <em>rep()</em> avec les options <em>each</em> ou <em>times</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>), <span class="at">each =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 1 1 1 3 3 3 5 5 5 7 7 7</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>), <span class="at">times =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 1 3 5 7 1 3 5 7 1 3 5 7</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour connaître la taille d’un vecteur, on utilise la fonction <em>length()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour connaître la somme de tous les éléments d’un vecteur, on utilise la fonction <em>sum()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour connaître la moyenne de tous les éléments d’un vecteur, on utilise la fonction <em>mean()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.5</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour connaître la valeur maximale de tous les éléments d’un vecteur, on utilise la fonction <em>max()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour connaître la valeur minimale de tous les éléments d’un vecteur, on utilise la fonction <em>min()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\bullet\)</span> Pour connaître le nombre de données manquantes d’un vecteur, on applique la fonction <em>sum()</em> à l’indicatrice des données manquantes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">c</span>(<span class="dv">51</span>,<span class="cn">NA</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="cn">NA</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+<p><em>Remarque :</em> de façon générale, la fonction <em>sum()</em> appliquée à un vecteur de booléens renvoie le nombre de valeurs <em>TRUE</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">c</span>(T,F,F,F))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="informations-générales-de-la-base" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="informations-générales-de-la-base"><span class="header-section-number">3.2</span> Informations générales de la base</h2>
+<p>Pour connaître le noms des colonnes du tableau, on utilise la fonction <em>colnames()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "DATAFLOW"    "LAST.UPDATE" "freq"        "unit"        "age"        
+ [6] "sex"         "geo"         "TIME_PERIOD" "OBS_VALUE"   "OBS_FLAG"   </code></pre>
+</div>
+</div>
+<p>Pour afficher les premières lignes du tableau, on utilise la fonction <em>head()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             DATAFLOW       LAST.UPDATE freq unit age sex geo TIME_PERIOD
+1 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2013
+2 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2014
+3 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2015
+4 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2016
+5 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2017
+6 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2018
+  OBS_VALUE OBS_FLAG
+1      18.4         
+2      18.5         
+3      17.8         
+4      18.3         
+5      18.0         
+6      18.5         </code></pre>
+</div>
+</div>
+<p>Pour connaître le nombre d’observations présentes dans le tableau, on peut simplement regarder dans l’onglet environnement. Cependant, il peut parfois être utile d’avoir accès à ce nombre, pour cela on utilise <em>nrow()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1578</code></pre>
+</div>
+</div>
+<p>De même, pour le nombre de colonne, on utilise <em>ncol()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10</code></pre>
+</div>
+</div>
+<p><em>Remarque :</em> on pourrait également obtenir ce nombre en regardant la taille du vecteur des noms de colonnes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">colnames</span>(df))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10</code></pre>
+</div>
+</div>
+</section>
+<section id="accès-aux-données-du-tableaux" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="accès-aux-données-du-tableaux"><span class="header-section-number">3.3</span> Accès aux données du tableaux</h2>
+<section id="en-utilisant-les-indices" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="en-utilisant-les-indices"><span class="header-section-number">3.3.1</span> En utilisant les indices</h3>
+<p>Il est possible d’afficher une ligne spécifique en utilisant son indice. Par exemple regardons la première ligne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span>,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             DATAFLOW       LAST.UPDATE freq unit age sex geo TIME_PERIOD
+1 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2013
+  OBS_VALUE OBS_FLAG
+1      18.4         </code></pre>
+</div>
+</div>
+<p><b> En fait, pour afficher un élément du tableaux, on utilise les crochets [. , .], le premier élément dans le crochet correspond à la ligne, et le deuxième à la colonne. </b> <br></p>
+<p>Si je veux afficher la valeur de la neuvième colonne de la première observation, je fais</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span>,<span class="dv">9</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4</code></pre>
+</div>
+</div>
+<p>Si je souhaite afficher toutes les colonnes, il suffit de ne rien mettre après la virgule</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span>,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             DATAFLOW       LAST.UPDATE freq unit age sex geo TIME_PERIOD
+1 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   F  AL        2013
+  OBS_VALUE OBS_FLAG
+1      18.4         </code></pre>
+</div>
+</div>
+<p>De même si je veux toutes les lignes d’une colonne spécifiques, je ne mets rien avant la virgule</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df[,<span class="dv">9</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4 18.5 17.8 18.3 18.0 18.5</code></pre>
+</div>
+</div>
+<p>Je peux également accéder à une section de lignes ou de colonnes :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">9</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4 18.5 17.8 18.3 18.0</code></pre>
+</div>
+</div>
+<p>Permet d’afficher les observation 1 à 5 de la neuvième colonne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">9</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  geo TIME_PERIOD OBS_VALUE
+1  AL        2013      18.4</code></pre>
+</div>
+</div>
+<p>Permet d’afficher les valeurs des colonnes 7, 8 et 9 de la première ligne<br> <br> Pour connaître les indices des colonnes qui nous intéresse, on peut utiliser <em>colnames()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "DATAFLOW"    "LAST.UPDATE" "freq"        "unit"        "age"        
+ [6] "sex"         "geo"         "TIME_PERIOD" "OBS_VALUE"   "OBS_FLAG"   </code></pre>
+</div>
+</div>
+<p>Ainsi je sais que “OBS_VALUE” correspond à la neuvième colonne</p>
+</section>
+<section id="en-utilisant-le-nom-de-la-colonne" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="en-utilisant-le-nom-de-la-colonne"><span class="header-section-number">3.3.2</span> En utilisant le nom de la colonne</h3>
+<p>Il est souvent plus pratique d’utiliser le nom de la colonne.<br></p>
+<p>Pour accéder à une colonne spécifique via son nom, on utilise <em>$</em> entre le nom de la base et le nom de la colonne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df<span class="sc">$</span>OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4 18.5 17.8 18.3 18.0 18.5</code></pre>
+</div>
+</div>
+<p>Ainsi, on peut aussi accéder à une valeur d’une colonne de la façon suivante :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>OBS_VALUE[<span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4</code></pre>
+</div>
+</div>
+<p><em>Remarque :</em> cela revient à faire</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span>, <span class="dv">9</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4</code></pre>
+</div>
+</div>
+<p>vu précédemment. <br> <br></p>
+<p>On peut accéder à plusieurs valeurs d’une colonne en utilisant la notation de section <em>:</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>OBS_VALUE[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4 18.5 17.8 18.3 18.0</code></pre>
+</div>
+</div>
+<p>ou en spécifiant des numéros précis, par exemple les observations 1, 3, 5 et 10</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>OBS_VALUE[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4 17.8 18.0 17.2</code></pre>
+</div>
+</div>
+<p>Il est également possible de préciser entre guillemets le noms de colonnes à extraire</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="st">"OBS_VALUE"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.4 18.5 17.8 18.3 18.0</code></pre>
+</div>
+</div>
+<p>Pour en sélectionner plusieurs, on rentre les noms dans un vecteur</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> ,<span class="fu">c</span>(<span class="st">"geo"</span>, <span class="st">"TIME_PERIOD"</span>, <span class="st">"OBS_VALUE"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  geo TIME_PERIOD OBS_VALUE
+1  AL        2013      18.4
+2  AL        2014      18.5
+3  AL        2015      17.8
+4  AL        2016      18.3
+5  AL        2017      18.0</code></pre>
+</div>
+</div>
+<section id="sélectionner-plusieurs-colonnes-dans-un-nouveau-tableau" class="level4">
+<h4 class="anchored" data-anchor-id="sélectionner-plusieurs-colonnes-dans-un-nouveau-tableau">Sélectionner plusieurs colonnes dans un nouveau tableau</h4>
+<section id="r-de-base" class="level5">
+<h5 class="anchored" data-anchor-id="r-de-base">R de base</h5>
+<p>Pour créer un sous-tableaux en sélectionnant des colonnes spécifiques <br> je peux soit regarder leurs indices et les utiliser pour spécifier les colonnes que je souhaite</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df[,<span class="dv">6</span><span class="sc">:</span><span class="dv">9</span>]</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+<p>Mais je peux aussi le faire en utilisant directement le nom des colonnes dans un vecteur</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>df_1_base2 <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(<span class="st">"sex"</span>,<span class="st">"geo"</span>, <span class="st">"TIME_PERIOD"</span>, <span class="st">"OBS_VALUE"</span>)]</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+<p>Une autre façon de faire, est d’utiliser la fonction <em>subset()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>df_1_base3 <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, <span class="at">select =</span> <span class="fu">c</span>(<span class="st">"sex"</span>,<span class="st">"geo"</span>, <span class="st">"TIME_PERIOD"</span>, <span class="st">"OBS_VALUE"</span>))</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+<p>Avec cette fonction il n’est pas nécéssaire de mettre les noms de variables entre guillements</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>df_1_base3 <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, <span class="at">select =</span> <span class="fu">c</span>(sex,geo, TIME_PERIOD, OBS_VALUE))</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+<p>Et on peut aussi utiliser les indices</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>df_1_base3 <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, <span class="at">select =</span> <span class="fu">c</span>(<span class="dv">6</span><span class="sc">:</span><span class="dv">9</span>))</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+</section>
+<section id="tidyverse" class="level5">
+<h5 class="anchored" data-anchor-id="tidyverse">Tidyverse</h5>
+<p>En tidyverse, on utilise la fonction <em>select()</em> du package <em>dplyr</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sex, geo, TIME_PERIOD, OBS_VALUE)</span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="sélectionner-plusieurs-lignes-dans-un-nouveau-tableau" class="level4">
+<h4 class="anchored" data-anchor-id="sélectionner-plusieurs-lignes-dans-un-nouveau-tableau">Sélectionner plusieurs lignes dans un nouveau tableau</h4>
+<p>Il arrive souvent que l’on veuille sélectionner des lignes spécifiques pour ne travailler que sur celles-ci. Nous pouvons appliquer une fonction pour filtrer ces lignes. <br> <br> Par exemple, dans le tableau df on ne garde que les observations hommes/femmes confondus, i.e celles dont la valeur de “sex” est “T”</p>
+<section id="r-base" class="level5">
+<h5 class="anchored" data-anchor-id="r-base">R base</h5>
+<p>Pour sélectionner un ensemble de lignes en fonction d’une condition en R base, on fait une sélection en specifiant la conditions à la place des numéros de lignes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>df_2_base <span class="ot">&lt;-</span> df[df<span class="sc">$</span>sex<span class="sc">==</span><span class="st">"T"</span>,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="tidyverse-1" class="level5">
+<h5 class="anchored" data-anchor-id="tidyverse-1">Tidyverse</h5>
+<p>Pour selectionner des lignes spécifiques en tidyverse, on utilise la fonction <em>filter()</em> du package <em>dplyr</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>df_2_tidy <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex<span class="sc">==</span><span class="st">"T"</span>)</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_2_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             DATAFLOW       LAST.UPDATE freq unit age sex geo TIME_PERIOD
+1 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   T  AL        2013
+2 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   T  AL        2014
+3 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   T  AL        2015
+4 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   T  AL        2016
+5 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   T  AL        2017
+6 ESTAT:TPS00026(1.0) 16/03/23 11:00:00    A   YR Y65   T  AL        2018
+  OBS_VALUE OBS_FLAG
+1      17.5         
+2      17.6         
+3      17.1         
+4      17.6         
+5      17.5         
+6      17.8         </code></pre>
+</div>
+</div>
+<p><em>Remarque :</em> On peut combiner les fonctions <em>select()</em> et <em>filter()</em>, mais attention, l’ordre est important puisque dès qu’une manipulation est faite, elle est conservée dans la suite :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>df_3_tidy <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex<span class="sc">==</span><span class="st">"T"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geo, TIME_PERIOD, OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Selectionne les colonnes geo, TIME_PERIOD et OBS_VALUE et ne conserve que les données pour la population totale <br> <br> En revanche</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df_3_tidy &lt;- df %&gt;% </span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  select(geo, TIME_PERIOD, OBS_VALUE) %&gt;% </span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  filter(sex=="T")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Retourne une erreur car on tente de filtrer des observations en fonction d’une variable (sex) qui n’est plus disponible dans notre table</p>
+</section>
+</section>
+</section>
+</section>
+<section id="supprimer-une-colonne" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="supprimer-une-colonne"><span class="header-section-number">3.4</span> Supprimer une colonne</h2>
+<section id="r-base-1" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="r-base-1"><span class="header-section-number">3.4.1</span> R base</h3>
+<p>Il y a plusieurs façons de supprimer une colonne en R base <br> Dans tous les cas, cela marche comme pour une sélection de colonnes, mais au lieu de préciser les colonnes à garder, on spécifie les colonnes à supprimer<br> <br> 1) Avec les indices de la colonne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>df_1_remove <span class="ot">&lt;-</span> df_1_base[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">5</span>)] <span class="co"># Rq : cela marche aussi en mettant la virgule avant -c(5) df1_base[,-c(5)]</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_remove)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+</div>
+<p>Pour supprimer plusieurs colonnes, on peut spécifier plusieurs indices</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>df_1_remove <span class="ot">&lt;-</span> df_1_base[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>)]</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_remove)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  geo TIME_PERIOD OBS_VALUE
+1  AL        2013      18.4
+2  AL        2014      18.5
+3  AL        2015      17.8
+4  AL        2016      18.3
+5  AL        2017      18.0
+6  AL        2018      18.5</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Avec le nom de la colonne Pour supprimer une colonne via son nom, on peut faire une sélection de colonnes en indiquant qu’on veut sélectionner les colonnes dont le nom n’est pas dans un vecteur contenant le nom de la ou des colonnes à supprimer</li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>df_1_remove <span class="ot">&lt;-</span> df_1_base[, <span class="sc">!</span>(<span class="fu">names</span>(df_1_base) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"geo"</span>, <span class="st">"sex"</span>))]</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_remove)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  TIME_PERIOD OBS_VALUE
+1        2013      18.4
+2        2014      18.5
+3        2015      17.8
+4        2016      18.3
+5        2017      18.0
+6        2018      18.5</code></pre>
+</div>
+</div>
+<p>Attention : on ne peut pas supprimer une colonne en remplaçant l’indice par le nom, comme on peut le faire pour la sélection</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df_1_base[-c("geo")]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>renvoie une erreur <br> <br> On peut également supprimer une ou plusieurs lignes avec la fonction <em>subset()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>df_1_remove <span class="ot">&lt;-</span> <span class="fu">subset</span>(df_1_base, <span class="at">select =</span> <span class="sc">-</span><span class="fu">c</span>(geo, sex))</span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_remove)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  TIME_PERIOD OBS_VALUE
+1        2013      18.4
+2        2014      18.5
+3        2015      17.8
+4        2016      18.3
+5        2017      18.0
+6        2018      18.5</code></pre>
+</div>
+</div>
+</section>
+<section id="tidyverse-2" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="tidyverse-2"><span class="header-section-number">3.4.2</span> Tidyverse</h3>
+<p>Pour supprimer une ou plusieurs colonnes en tidyverse, on utilise la même fonction que pour faire une sélection de colonnes <em>select()</em>. Cette fois, on spécifie les colonnes à supprimer en mettant “-” avant le vecteur contenant le nom des colonnes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  AL        2013      18.4
+2   F  AL        2014      18.5
+3   F  AL        2015      17.8
+4   F  AL        2016      18.3
+5   F  AL        2017      18.0
+6   F  AL        2018      18.5</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>df_1_remove <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(geo, sex))</span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_remove)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  TIME_PERIOD OBS_VALUE
+1        2013      18.4
+2        2014      18.5
+3        2015      17.8
+4        2016      18.3
+5        2017      18.0
+6        2018      18.5</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="modifications-dans-un-tableau" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="modifications-dans-un-tableau"><span class="header-section-number">3.5</span> Modifications dans un tableau</h2>
+<section id="modifier-une-valeur-dun-tableau" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="modifier-une-valeur-dun-tableau"><span class="header-section-number">3.5.1</span> Modifier une valeur d’un tableau</h3>
+<p>Pour modifier une valeur précise, je peux le faire</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>df_1_base[<span class="dv">1</span>, <span class="st">"geo"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "AL"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>df_1_base[<span class="dv">1</span>, <span class="st">"geo"</span>] <span class="ot">&lt;-</span> <span class="st">"ALBANIA"</span></span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>df_1_base[<span class="dv">1</span>, <span class="st">"geo"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "ALBANIA"</code></pre>
+</div>
+</div>
+</section>
+<section id="modifier-une-colonne-entière" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="modifier-une-colonne-entière"><span class="header-section-number">3.5.2</span> Modifier une colonne entière</h3>
+<p>Je peux souhaiter modifier toutes les valeurs d’une colonne, pour cela j’applique une fonction à cette colonne</p>
+<section id="r-base-2" class="level4">
+<h4 class="anchored" data-anchor-id="r-base-2">R base</h4>
+<p>Nous allons par exemple utiliser la fonction <em>tolower</em> pour mettre en minuscules les valeurs de geo</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>geo <span class="ot">&lt;-</span> <span class="fu">tolower</span>(df_1_base<span class="sc">$</span>geo)</span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex     geo TIME_PERIOD OBS_VALUE
+1   F albania        2013      18.4
+2   F      al        2014      18.5
+3   F      al        2015      17.8
+4   F      al        2016      18.3
+5   F      al        2017      18.0
+6   F      al        2018      18.5</code></pre>
+</div>
+</div>
+</section>
+<section id="tidyverse-3" class="level4">
+<h4 class="anchored" data-anchor-id="tidyverse-3">Tidyverse</h4>
+<p>Pour appliquer une modification en tidyverse, on utilise la fonction <em>mutate()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">geo =</span> <span class="fu">tolower</span>(geo))</span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb124-4"><a href="#cb124-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE
+1   F  al        2013      18.4
+2   F  al        2014      18.5
+3   F  al        2015      17.8
+4   F  al        2016      18.3
+5   F  al        2017      18.0
+6   F  al        2018      18.5</code></pre>
+</div>
+</div>
+<p>L’avantage de mutate est que l’on peut modifier directement plusieurs colonnes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">geo =</span> <span class="fu">toupper</span>(geo),</span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> <span class="fu">case_when</span>(sex <span class="sc">==</span><span class="st">"F"</span> <span class="sc">~</span> <span class="st">"Female"</span>,</span>
+<span id="cb126-4"><a href="#cb126-4" aria-hidden="true" tabindex="-1"></a>                         sex <span class="sc">==</span> <span class="st">"M"</span> <span class="sc">~</span> <span class="st">"Male"</span>, </span>
+<span id="cb126-5"><a href="#cb126-5" aria-hidden="true" tabindex="-1"></a>                         sex <span class="sc">==</span> <span class="st">"T"</span> <span class="sc">~</span> <span class="st">"Total"</span>))</span>
+<span id="cb126-6"><a href="#cb126-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb126-7"><a href="#cb126-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sex geo TIME_PERIOD OBS_VALUE
+1 Female  AL        2013      18.4
+2 Female  AL        2014      18.5
+3 Female  AL        2015      17.8
+4 Female  AL        2016      18.3
+5 Female  AL        2017      18.0
+6 Female  AL        2018      18.5</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="convertir-une-colonne" class="level3" data-number="3.5.3">
+<h3 data-number="3.5.3" class="anchored" data-anchor-id="convertir-une-colonne"><span class="header-section-number">3.5.3</span> Convertir une colonne</h3>
+<p>Pour changer le type d’un vecteur on utilise les fonctions : <br> - <em>as.numeric()</em> pour convertir au format numérique <br> - <em>as.character()</em> pour convertir au format caractères <br> - <em>as.factor()</em> pour convertir en facteur <br></p>
+<p>Une colonne d’un tableau étant un vecteur, il suffit d’appliquer ces fonctions à la colonne que l’on souhaite transformer <br> <br> En R de base<br> <br> On modifie la colonne OBS_VALUE pour la passer en caractères puis on la repasse en numérique</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_base<span class="sc">$</span>OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "numeric"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>OBS_VALUE <span class="ot">&lt;-</span> <span class="fu">as.character</span>(df_1_base<span class="sc">$</span>OBS_VALUE)</span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_base<span class="sc">$</span>OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>OBS_VALUE <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_1_base<span class="sc">$</span>OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>On transforme la variable sex en facteur</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_base<span class="sc">$</span>sex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(df_1_base<span class="sc">$</span>sex)</span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_base<span class="sc">$</span>sex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "factor"</code></pre>
+</div>
+</div>
+<p>En tidyverse <br> On va modifier en une seule fois les variables OBS_VALUE en numérique et sex en facteur, puis on repasse la variable OBS_VALUE en numérique</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_tidy<span class="sc">$</span>OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "numeric"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_tidy<span class="sc">$</span>sex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">OBS_VALUE =</span> <span class="fu">as.character</span>(OBS_VALUE),</span>
+<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> <span class="fu">as.factor</span>(sex))</span>
+<span id="cb141-4"><a href="#cb141-4" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_tidy<span class="sc">$</span>OBS_VALUE)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_tidy<span class="sc">$</span>sex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "factor"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> <span class="fu">mutate</span>(df_1_tidy, <span class="at">OBS_VALUE=</span><span class="fu">as.numeric</span>(OBS_VALUE))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="créer-une-nouvelle-colonne" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="créer-une-nouvelle-colonne"><span class="header-section-number">3.6</span> Créer une nouvelle colonne</h2>
+<p>On peut créer des nouvelles colonnes en spécifiant les valeurs pour chaque observation dans un vecteur. Attention, il faut que la taille du vecteur soit égale au nombre de ligne du tableau. On peut aussi créer une nouvelle colonne en appliquant une fonction ou des opérations à une ou plusieurs autres variables.</p>
+<section id="r-base-3" class="level3" data-number="3.6.1">
+<h3 data-number="3.6.1" class="anchored" data-anchor-id="r-base-3"><span class="header-section-number">3.6.1</span> R base</h3>
+<p>Pour créer une colonne en R base, il suffit de la définir en lui assignant la valeur qu’elle doit prendre. Pour cela, on créer le vecteur Nom_de_la_base$Nom_nouvelle_colonne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>Id <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_1_base)</span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> sex         geo             TIME_PERIOD     OBS_VALUE           Id        
+ F:526   Length:1578        Min.   :2010   Min.   :11.60   Min.   :   1.0  
+ M:526   Class :character   1st Qu.:2012   1st Qu.:17.00   1st Qu.: 395.2  
+ T:526   Mode  :character   Median :2015   Median :18.90   Median : 789.5  
+                            Mean   :2015   Mean   :18.64   Mean   : 789.5  
+                            3rd Qu.:2018   3rd Qu.:20.60   3rd Qu.:1183.8  
+                            Max.   :2021   Max.   :24.00   Max.   :1578.0  </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex     geo TIME_PERIOD OBS_VALUE Id
+1   F albania        2013      18.4  1
+2   F      al        2014      18.5  2
+3   F      al        2015      17.8  3
+4   F      al        2016      18.3  4
+5   F      al        2017      18.0  5
+6   F      al        2018      18.5  6</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>Esp2 <span class="ot">&lt;-</span> df_1_base<span class="sc">$</span>OBS_VALUE<span class="sc">**</span><span class="dv">2</span></span>
+<span id="cb150-2"><a href="#cb150-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex     geo TIME_PERIOD OBS_VALUE Id   Esp2
+1   F albania        2013      18.4  1 338.56
+2   F      al        2014      18.5  2 342.25
+3   F      al        2015      17.8  3 316.84
+4   F      al        2016      18.3  4 334.89
+5   F      al        2017      18.0  5 324.00
+6   F      al        2018      18.5  6 342.25</code></pre>
+</div>
+</div>
+</section>
+<section id="tidyverse-4" class="level3" data-number="3.6.2">
+<h3 data-number="3.6.2" class="anchored" data-anchor-id="tidyverse-4"><span class="header-section-number">3.6.2</span> Tidyverse</h3>
+<p>Pour créer une colonne en tidyverse, on utilise la même fonction que pour modifier une colonne : <em>mutate()</em>. La différence étant qu’au lieu de rentrer le nom de la colonne à modifier, on entre le nom que l’on souhaite donner à la nouvelle colonne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb152-2"><a href="#cb152-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_1_tidy),</span>
+<span id="cb152-3"><a href="#cb152-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">Esp2 =</span> OBS_VALUE<span class="sc">**</span><span class="dv">2</span>)</span>
+<span id="cb152-4"><a href="#cb152-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sex          geo             TIME_PERIOD     OBS_VALUE    
+ Female:526   Length:1578        Min.   :2010   Min.   :11.60  
+ Male  :526   Class :character   1st Qu.:2012   1st Qu.:17.00  
+ Total :526   Mode  :character   Median :2015   Median :18.90  
+                                 Mean   :2015   Mean   :18.64  
+                                 3rd Qu.:2018   3rd Qu.:20.60  
+                                 Max.   :2021   Max.   :24.00  
+       Id              Esp2      
+ Min.   :   1.0   Min.   :134.6  
+ 1st Qu.: 395.2   1st Qu.:289.0  
+ Median : 789.5   Median :357.2  
+ Mean   : 789.5   Mean   :353.7  
+ 3rd Qu.:1183.8   3rd Qu.:424.4  
+ Max.   :1578.0   Max.   :576.0  </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sex geo TIME_PERIOD OBS_VALUE Id   Esp2
+1 Female  AL        2013      18.4  1 338.56
+2 Female  AL        2014      18.5  2 342.25
+3 Female  AL        2015      17.8  3 316.84
+4 Female  AL        2016      18.3  4 334.89
+5 Female  AL        2017      18.0  5 324.00
+6 Female  AL        2018      18.5  6 342.25</code></pre>
+</div>
+</div>
+<p>Pour la suite on supprime la colonne Esp2 dans les deux tableaux</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb156"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[, <span class="fu">names</span>(df_1_base) <span class="sc">!=</span> <span class="st">"Esp2"</span>]</span>
+<span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb156-3"><a href="#cb156-3" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> <span class="fu">select</span>(df_1_tidy, <span class="sc">-</span><span class="st">"Esp2"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="renommer-une-colonne" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="renommer-une-colonne"><span class="header-section-number">3.7</span> Renommer une colonne</h2>
+<section id="r-base-4" class="level3" data-number="3.7.1">
+<h3 data-number="3.7.1" class="anchored" data-anchor-id="r-base-4"><span class="header-section-number">3.7.1</span> R base</h3>
+<p>Pour renommer une variable en R base, on modifie sa valeur dans le vecteur contenant les noms de colonnes, c’est à dire le vecteur obtenu avec la fonction <em>colnames()</em><br> On modifie la valeur de ce vecteur par l’indice de la variable à modifier<br> <br> Par exemple, si je veux renommer ma variable TIME_PERIOD en Year</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "sex"         "geo"         "TIME_PERIOD" "OBS_VALUE"   "Id"         </code></pre>
+</div>
+</div>
+<p>TIME_PERIOD est la 3ième valeur, je dois donc modifier *colnames(df_1_base)[3]</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_1_base)[<span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="st">"Year"</span></span>
+<span id="cb159-2"><a href="#cb159-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex     geo Year OBS_VALUE Id
+1   F albania 2013      18.4  1
+2   F      al 2014      18.5  2
+3   F      al 2015      17.8  3
+4   F      al 2016      18.3  4
+5   F      al 2017      18.0  5
+6   F      al 2018      18.5  6</code></pre>
+</div>
+</div>
+<p>ou en indiquant qu’il faut modifier la colonne dont le nom est spécifié</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_1_base)[<span class="fu">colnames</span>(df_1_base)<span class="sc">==</span><span class="st">"Year"</span>] <span class="ot">&lt;-</span> <span class="st">"TIME_PERIOD"</span></span>
+<span id="cb161-2"><a href="#cb161-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex     geo TIME_PERIOD OBS_VALUE Id
+1   F albania        2013      18.4  1
+2   F      al        2014      18.5  2
+3   F      al        2015      17.8  3
+4   F      al        2016      18.3  4
+5   F      al        2017      18.0  5
+6   F      al        2018      18.5  6</code></pre>
+</div>
+</div>
+<p>On peut également faire cela en utilisant <em>names()</em> au lieu de <em>colnames()</em> exactement de la même façon</p>
+</section>
+<section id="tidyverse-5" class="level3" data-number="3.7.2">
+<h3 data-number="3.7.2" class="anchored" data-anchor-id="tidyverse-5"><span class="header-section-number">3.7.2</span> Tidyverse</h3>
+<p>Pour renommer une fonction en tidyverse, on utilise la fonction <em>rename()</em>. On indique Nouveau_nom = ancien_nom</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb163-2"><a href="#cb163-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Year =</span> TIME_PERIOD)</span>
+<span id="cb163-3"><a href="#cb163-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sex geo Year OBS_VALUE Id
+1 Female  AL 2013      18.4  1
+2 Female  AL 2014      18.5  2
+3 Female  AL 2015      17.8  3
+4 Female  AL 2016      18.3  4
+5 Female  AL 2017      18.0  5
+6 Female  AL 2018      18.5  6</code></pre>
+</div>
+</div>
+<p>Pour la suite je renomme la variable en TIME_PERIOD</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb165-2"><a href="#cb165-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">TIME_PERIOD =</span> Year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="ordonner-la-base-en-fonction-dune-ou-plusieurs-colonnes" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="ordonner-la-base-en-fonction-dune-ou-plusieurs-colonnes"><span class="header-section-number">3.8</span> Ordonner la base en fonction d’une ou plusieurs colonnes</h2>
+<section id="r-base-5" class="level3" data-number="3.8.1">
+<h3 data-number="3.8.1" class="anchored" data-anchor-id="r-base-5"><span class="header-section-number">3.8.1</span> R base</h3>
+<p>Pour ordonner une base en fonction d’une variable en R base, il faut sélectionner les lignes dans l’ordre souhaité. Il faut donc d’abord trier le vecteur contenant la variable selon laquelle faire le tri <br></p>
+<section id="variables-numériques" class="level4">
+<h4 class="anchored" data-anchor-id="variables-numériques">Variables numériques</h4>
+<p><br> Pour trier un vecteur en R, on utilise la fonction <em>sort()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2 4 5 6 9</code></pre>
+</div>
+</div>
+<p>Par défaut la fonction sort trie par ordre croissant, pour trier dans l’ordre décroissant, il faut préciser <em>decreasing = T</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>), <span class="at">decreasing =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9 6 5 4 2</code></pre>
+</div>
+</div>
+<p>Une autre fonction de trier un vecteur est d’utiliser la fonction <em>order()</em> <br> <b> Attention </b> cette fonction renvoie les <b> indices </b> dans l’ordre croissant de leur valeur</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">order</span>(<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2 3 4 5 1</code></pre>
+</div>
+</div>
+<p>Pour avoir le vecteur trier dans l’ordre coissant, il faut donc faire</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>)[<span class="fu">order</span>(<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>))]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2 4 5 6 9</code></pre>
+</div>
+</div>
+<p>De même que pour <em>sort()</em>, on précise <em>decreasing = T</em> pour trier dans l’ordre décroissant. <br> <br> Cette façon de faire est moins adapter pour trier un vecteur, en revanche elle est très bien adaptée pour trier un data.frame. En effet, comme elle renvoie les indices triés dans l’ordre croissant de leur valeur, pour trier le dataframe, il suffit de faire une sélection de lignes en sélectionnant les lignes par ce vecetur d’indices triés. Les lignes seront donc sélectionnées dans l’ordre souhaité <br> <br></p>
+<p>Pour trier notre tableau par odre croissant de l’espérance de vie à 65 ans, on applique la fonction <em>order()</em> à OBS_VALUE</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb174"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[<span class="fu">order</span>(df_1_base<span class="sc">$</span>OBS_VALUE),]</span>
+<span id="cb174-2"><a href="#cb174-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    sex geo TIME_PERIOD OBS_VALUE  Id
+584   M  bg        2021      11.6 584
+875   M  md        2010      11.9 875
+585   M  by        2011      12.0 585
+986   M  ru        2010      12.1 986
+889   M  me        2021      12.2 889
+985   M  rs        2021      12.2 985</code></pre>
+</div>
+</div>
+<p>Pour trier par ordre décroissant de l’espérance de vie à 65 ans, on précise <em>decreasing = T</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb176"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[<span class="fu">order</span>(df_1_base<span class="sc">$</span>OBS_VALUE, <span class="at">decreasing =</span> T),]</span>
+<span id="cb176-2"><a href="#cb176-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    sex geo TIME_PERIOD OBS_VALUE  Id
+222   F  fr        2014      24.0 222
+173   F  es        2019      23.9 173
+227   F  fr        2019      23.9 227
+219   F  fr        2011      23.8 219
+226   F  fr        2018      23.8 226
+231   F  fx        2011      23.8 231</code></pre>
+</div>
+</div>
+<p>On peut également ordonner par plusieurs variables en les précisants dans l’ordre de tri souhaité dans <em>order()</em> <br> <br> Pour trier par années et par espérance de vie à 65 ans <br></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Au préalable je tranforme TIME_PERIOD en variable numérique</span></span>
+<span id="cb178-2"><a href="#cb178-2" aria-hidden="true" tabindex="-1"></a>df_1_base<span class="sc">$</span>TIME_PERIOD <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_1_base<span class="sc">$</span>TIME_PERIOD)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb179"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb179-1"><a href="#cb179-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[<span class="fu">order</span>(df_1_base<span class="sc">$</span>TIME_PERIOD, df_1_base<span class="sc">$</span>OBS_VALUE),]</span>
+<span id="cb179-2"><a href="#cb179-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sex geo TIME_PERIOD OBS_VALUE   Id
+875    M  md        2010      11.9  875
+986    M  ru        2010      12.1  986
+1034   M  ua        2010      12.2 1034
+863    M  lv        2010      13.1  863
+1401   T  md        2010      13.6 1401
+573    M  bg        2010      13.8  573</code></pre>
+</div>
+</div>
+<p>On peut aussi trier par ordre croissant pour certaines variables et decroissant pour d’autres. Pour cela on met “-” devant les variables à trier par ordre décroissant.<br> <br> Exemple : trier par années les plus récentes, par espérance de vie à 65 ans</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[<span class="fu">order</span>(<span class="sc">-</span>df_1_base<span class="sc">$</span>TIME_PERIOD, df_1_base<span class="sc">$</span>OBS_VALUE),]</span>
+<span id="cb181-2"><a href="#cb181-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    sex geo TIME_PERIOD OBS_VALUE  Id
+584   M  bg        2021      11.6 584
+889   M  me        2021      12.2 889
+985   M  rs        2021      12.2 985
+901   M  mk        2021      12.5 901
+973   M  ro        2021      12.5 973
+874   M  lv        2021      12.7 874</code></pre>
+</div>
+</div>
+</section>
+<section id="variables-facteurs-ou-caractères" class="level4">
+<h4 class="anchored" data-anchor-id="variables-facteurs-ou-caractères">Variables facteurs ou caractères</h4>
+<p>On peut aussi ordonner un vecteur selon les données d’une variable catégorielle (de type facteur), ou même d’une variable en caractère.Cela fonctionne exactement comme pour une variable numérique</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb183"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb183-1"><a href="#cb183-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_base<span class="sc">$</span>sex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "factor"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb185"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[<span class="fu">order</span>(df_1_base<span class="sc">$</span>sex),]</span>
+<span id="cb185-2"><a href="#cb185-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    sex geo TIME_PERIOD OBS_VALUE  Id
+375   F  mk        2021      14.9 375
+459   F  rs        2021      15.1 459
+58    F  bg        2021      15.5  58
+363   F  me        2021      15.5 363
+9     F  al        2021      15.8   9
+447   F  ro        2021      16.4 447</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb187"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_base<span class="sc">$</span>geo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb189"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true" tabindex="-1"></a>df_1_base <span class="ot">&lt;-</span> df_1_base[<span class="fu">order</span>(df_1_base<span class="sc">$</span>geo),]</span>
+<span id="cb189-2"><a href="#cb189-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_base)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  sex geo TIME_PERIOD OBS_VALUE Id
+9   F  al        2021      15.8  9
+8   F  al        2020      17.7  8
+7   F  al        2019      18.7  7
+6   F  al        2018      18.5  6
+5   F  al        2017      18.0  5
+4   F  al        2016      18.3  4</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="tidyverse-6" class="level3" data-number="3.8.2">
+<h3 data-number="3.8.2" class="anchored" data-anchor-id="tidyverse-6"><span class="header-section-number">3.8.2</span> Tidyverse</h3>
+<section id="variables-numériques-1" class="level4">
+<h4 class="anchored" data-anchor-id="variables-numériques-1">Variables numériques</h4>
+<p>Pour trier un tableau en tidyverse, on utilise la fonction <em>arrange()</em> <br> <br> Exemple : pour trier notre tableau par odre croissant de l’espérance de vie à 65 ans, on applique la fonction <em>arrange</em> à OBS_VALUE</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb191"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb191-2"><a href="#cb191-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(OBS_VALUE)</span>
+<span id="cb191-3"><a href="#cb191-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sex geo TIME_PERIOD OBS_VALUE  Id
+1 Male  BG        2021      11.6 584
+2 Male  MD        2010      11.9 875
+3 Male  BY        2011      12.0 585
+4 Male  RU        2010      12.1 986
+5 Male  ME        2021      12.2 889
+6 Male  RS        2021      12.2 985</code></pre>
+</div>
+</div>
+<p>Pour trier par ordre décroissant, on applique la fonction <em>desc()</em> au nom de la variable</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb193-2"><a href="#cb193-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(OBS_VALUE))</span>
+<span id="cb193-3"><a href="#cb193-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sex geo TIME_PERIOD OBS_VALUE  Id
+1 Female  FR        2014      24.0 222
+2 Female  ES        2019      23.9 173
+3 Female  FR        2019      23.9 227
+4 Female  FR        2011      23.8 219
+5 Female  FR        2018      23.8 226
+6 Female  FX        2011      23.8 231</code></pre>
+</div>
+</div>
+<p>On peut également trier selon plusieurs variables : <br> Exemple : trier par années les plus récentes, par espérance de vie à 65 ans</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb195"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb195-1"><a href="#cb195-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb195-2"><a href="#cb195-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(TIME_PERIOD), OBS_VALUE)</span>
+<span id="cb195-3"><a href="#cb195-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   sex geo TIME_PERIOD OBS_VALUE  Id
+1 Male  BG        2021      11.6 584
+2 Male  ME        2021      12.2 889
+3 Male  RS        2021      12.2 985
+4 Male  MK        2021      12.5 901
+5 Male  RO        2021      12.5 973
+6 Male  LV        2021      12.7 874</code></pre>
+</div>
+</div>
+</section>
+<section id="variables-facteurs-ou-caractères-1" class="level4">
+<h4 class="anchored" data-anchor-id="variables-facteurs-ou-caractères-1">Variables facteurs ou caractères</h4>
+<p>On peut appliquer la fonction <em>arrange()</em> de la même façon que pour des variables numériques à des variables de type facteur ou caractère</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb197"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_tidy<span class="sc">$</span>sex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "factor"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb199"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb199-2"><a href="#cb199-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(sex))</span>
+<span id="cb199-3"><a href="#cb199-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    sex geo TIME_PERIOD OBS_VALUE   Id
+1 Total  BG        2021      13.6 1110
+2 Total  MK        2021      13.7 1427
+3 Total  RS        2021      13.7 1511
+4 Total  ME        2021      13.9 1415
+5 Total  RO        2021      14.6 1499
+6 Total  AL        2021      14.8 1061</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb201"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb201-1"><a href="#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(df_1_tidy<span class="sc">$</span>geo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb203"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb203-1"><a href="#cb203-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb203-2"><a href="#cb203-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo)</span>
+<span id="cb203-3"><a href="#cb203-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    sex geo TIME_PERIOD OBS_VALUE   Id
+1 Total  AL        2021      14.8 1061
+2 Total  AL        2020      16.6 1060
+3 Total  AL        2019      18.1 1059
+4 Total  AL        2018      17.8 1058
+5 Total  AL        2017      17.5 1057
+6 Total  AL        2016      17.6 1056</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="connaître-les-différentes-valeurs-prises-par-une-variable" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="connaître-les-différentes-valeurs-prises-par-une-variable"><span class="header-section-number">3.9</span> Connaître les différentes valeurs prises par une variable</h2>
+<p>La fonction <em>unique()</em> crée un vecteur qui contient chaque valeur prise par la variable, mais de façon unique</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb205"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(df<span class="sc">$</span>geo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "AL"        "AM"        "AT"        "AZ"        "BE"        "BG"       
+ [7] "BY"        "CH"        "CY"        "CZ"        "DE"        "DK"       
+[13] "EA19"      "EA20"      "EE"        "EL"        "ES"        "EU27_2007"
+[19] "EU27_2020" "EU28"      "FI"        "FR"        "FX"        "GE"       
+[25] "HR"        "HU"        "IE"        "IS"        "IT"        "LI"       
+[31] "LT"        "LU"        "LV"        "MD"        "ME"        "MK"       
+[37] "MT"        "NL"        "NO"        "PL"        "PT"        "RO"       
+[43] "RS"        "RU"        "SE"        "SI"        "SK"        "SM"       
+[49] "TR"        "UA"        "UK"        "XK"       </code></pre>
+</div>
+</div>
+<p>Pour savoir combien de valeurs différentes une variable prend, on peut donc regarder la taille du vecteur créer avec <em>unique()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb207"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb207-1"><a href="#cb207-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(df<span class="sc">$</span>geo))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 52</code></pre>
+</div>
+</div>
+<p>La variable geo prend 52 valeurs différentes <br> <br> Si on veut savoir combien de fois chaque valeur est prise, on peut utiliser la fonction <em>table()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb209"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb209-1"><a href="#cb209-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(df<span class="sc">$</span>geo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+       AL        AM        AT        AZ        BE        BG        BY        CH 
+       27        15        36        24        36        36        24        36 
+       CY        CZ        DE        DK      EA19      EA20        EE        EL 
+       36        36        36        36        36         3        36        36 
+       ES EU27_2007 EU27_2020      EU28        FI        FR        FX        GE 
+       36        27        36        27        36        36         9        24 
+       HR        HU        IE        IS        IT        LI        LT        LU 
+       36        36        36        36        36        36        36        36 
+       LV        MD        ME        MK        MT        NL        NO        PL 
+       36         9        36        36        36        36        36        36 
+       PT        RO        RS        RU        SE        SI        SK        SM 
+       36        36        36         3        36        36        36         3 
+       TR        UA        UK        XK 
+       30        27        27         3 </code></pre>
+</div>
+</div>
+<p><br></p>
+</section>
+<section id="transposer-un-tableau" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="transposer-un-tableau"><span class="header-section-number">3.10</span> Transposer un tableau</h2>
+<p>Il peut parfois être nécessaire de transposer un tableau, ou du moins de transformer des lignes en colonnes ou inversement. <br> <br></p>
+<section id="transformer-des-lignes-en-colonnes---pivot_wider" class="level3" data-number="3.10.1">
+<h3 data-number="3.10.1" class="anchored" data-anchor-id="transformer-des-lignes-en-colonnes---pivot_wider"><span class="header-section-number">3.10.1</span> Transformer des lignes en colonnes - <em>pivot_wider()</em></h3>
+<p>Par exemple, dans le tableau df, nous avons une ligne par sexe, par pays, par année :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb211"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb211-1"><a href="#cb211-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy, <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      sex geo TIME_PERIOD OBS_VALUE   Id
+1   Total  AL        2021      14.8 1061
+2   Total  AL        2020      16.6 1060
+3   Total  AL        2019      18.1 1059
+4   Total  AL        2018      17.8 1058
+5   Total  AL        2017      17.5 1057
+6   Total  AL        2016      17.6 1056
+7   Total  AL        2015      17.1 1055
+8   Total  AL        2014      17.6 1054
+9   Total  AL        2013      17.5 1053
+10   Male  AL        2021      13.9  535
+11   Male  AL        2020      15.6  534
+12   Male  AL        2019      17.5  533
+13   Male  AL        2018      17.2  532
+14   Male  AL        2017      17.0  531
+15   Male  AL        2016      16.9  530
+16   Male  AL        2015      16.4  529
+17   Male  AL        2014      16.7  528
+18   Male  AL        2013      16.6  527
+19 Female  AL        2021      15.8    9
+20 Female  AL        2020      17.7    8</code></pre>
+</div>
+</div>
+<p>Pour certaines analyses, il peut être préférable d’avoir une ligne par pays, par année et les espérances de vie pour chaque sexe comme variable. Cela reviendrait à diviser par 3 le nombre de lignes et à créer 3 variables OBS_VALUE_F, OBS_VALUE_M et OBS_VALUE_T. <br> <br> Pour faire cela, on utilise la fonction <em>pivot_wider()</em> du package <em>tidyr</em> <br> Remarque : Ce nom vient du fait que l’on élargit le tableau en diminuant le nombre de lignes et augmentant le nombre de colonnes <br> <br> Pour appliquer la fonction, il faut que toutes les autres variables soient identiques entre les lignes à regrouper. Ici, nous avons créé la variable <em>Id</em> qui est unique pour chaque ligne du tableau. Si on essaie d’appliquer directement la fonction <em>pivot_wider()</em> au tableau <em>df_1_tidy</em>, nous n’aurons pas d’erreur, mais la fonction ne fera pas le travail attendu</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb213"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb213-1"><a href="#cb213-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb213-2"><a href="#cb213-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex,</span>
+<span id="cb213-3"><a href="#cb213-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> OBS_VALUE))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  geo   TIME_PERIOD    Id Total  Male Female
+  &lt;chr&gt;       &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 AL           2021  1061  14.8    NA     NA
+2 AL           2020  1060  16.6    NA     NA
+3 AL           2019  1059  18.1    NA     NA
+4 AL           2018  1058  17.8    NA     NA
+5 AL           2017  1057  17.5    NA     NA
+6 AL           2016  1056  17.6    NA     NA</code></pre>
+</div>
+</div>
+<p>Pour obtenir la transformation souhaitée, nous allons d’abord supprimer la colonne Id, puis appliquer <em>pivot_wider()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb215"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true" tabindex="-1"></a>df_1_tidy <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>Id)</span>
+<span id="cb215-2"><a href="#cb215-2" aria-hidden="true" tabindex="-1"></a>df_1_wider <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb215-3"><a href="#cb215-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex,</span>
+<span id="cb215-4"><a href="#cb215-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> OBS_VALUE)</span>
+<span id="cb215-5"><a href="#cb215-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb215-6"><a href="#cb215-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_wider)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  geo   TIME_PERIOD Total  Male Female
+  &lt;chr&gt;       &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 AL           2021  14.8  13.9   15.8
+2 AL           2020  16.6  15.6   17.7
+3 AL           2019  18.1  17.5   18.7
+4 AL           2018  17.8  17.2   18.5
+5 AL           2017  17.5  17     18  
+6 AL           2016  17.6  16.9   18.3</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb217"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb217-1"><a href="#cb217-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="fu">nrow</span>(df_1_wider), <span class="fu">ncol</span>(df_1_wider)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 526   5</code></pre>
+</div>
+</div>
+<p>Il est également possible d’attribuer un préfixe au nom des nouvelles variables, pour cela on utilise l’option <em>names_prefix =</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb219"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb219-1"><a href="#cb219-1" aria-hidden="true" tabindex="-1"></a>df_1_wider <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb219-2"><a href="#cb219-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex,</span>
+<span id="cb219-3"><a href="#cb219-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> OBS_VALUE,</span>
+<span id="cb219-4"><a href="#cb219-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_prefix =</span> <span class="st">"OBS_VALUE_"</span>)</span>
+<span id="cb219-5"><a href="#cb219-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb219-6"><a href="#cb219-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_wider)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  geo   TIME_PERIOD OBS_VALUE_Total OBS_VALUE_Male OBS_VALUE_Female
+  &lt;chr&gt;       &lt;int&gt;           &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;
+1 AL           2021            14.8           13.9             15.8
+2 AL           2020            16.6           15.6             17.7
+3 AL           2019            18.1           17.5             18.7
+4 AL           2018            17.8           17.2             18.5
+5 AL           2017            17.5           17               18  
+6 AL           2016            17.6           16.9             18.3</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb221"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb221-1"><a href="#cb221-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="fu">nrow</span>(df_1_wider), <span class="fu">ncol</span>(df_1_wider)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 526   5</code></pre>
+</div>
+</div>
+<p>La fonction <em>pivot_wider()</em> propose de nombreuses options pour personnaliser le noms des colonnes et permet de repérer les colonnes sur lesquelles faire les transformations. Nous ne pouvons pas toutes les montrer ici. <br> <br></p>
+<section id="transformer-plusieurs-lignes-en-même-temps" class="level4">
+<h4 class="anchored" data-anchor-id="transformer-plusieurs-lignes-en-même-temps">Transformer plusieurs lignes en même temps</h4>
+<p>Il est également possible de transformer plusieurs lignes d’un seul coup, s’il y a des combinaisons identiques. <br> <br> Par exemple dans notre tableau, on peut garder une lignes par pays et créer une variable par sexe par année : Female_2016, Male_2016, Total_2016, Female_2017, Male_2017, Total_2017, etc …</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb223"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb223-1"><a href="#cb223-1" aria-hidden="true" tabindex="-1"></a>df_1_wider_Sex_Year <span class="ot">&lt;-</span> df_1_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb223-2"><a href="#cb223-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="fu">c</span>(sex, TIME_PERIOD),</span>
+<span id="cb223-3"><a href="#cb223-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> OBS_VALUE)</span>
+<span id="cb223-4"><a href="#cb223-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-5"><a href="#cb223-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(df_1_wider_Sex_Year)) <span class="co"># La fonction kable permet un meilleur affichage du tableau</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 0%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">geo</th>
+<th style="text-align: right;">Total_2021</th>
+<th style="text-align: right;">Total_2020</th>
+<th style="text-align: right;">Total_2019</th>
+<th style="text-align: right;">Total_2018</th>
+<th style="text-align: right;">Total_2017</th>
+<th style="text-align: right;">Total_2016</th>
+<th style="text-align: right;">Total_2015</th>
+<th style="text-align: right;">Total_2014</th>
+<th style="text-align: right;">Total_2013</th>
+<th style="text-align: right;">Male_2021</th>
+<th style="text-align: right;">Male_2020</th>
+<th style="text-align: right;">Male_2019</th>
+<th style="text-align: right;">Male_2018</th>
+<th style="text-align: right;">Male_2017</th>
+<th style="text-align: right;">Male_2016</th>
+<th style="text-align: right;">Male_2015</th>
+<th style="text-align: right;">Male_2014</th>
+<th style="text-align: right;">Male_2013</th>
+<th style="text-align: right;">Female_2021</th>
+<th style="text-align: right;">Female_2020</th>
+<th style="text-align: right;">Female_2019</th>
+<th style="text-align: right;">Female_2018</th>
+<th style="text-align: right;">Female_2017</th>
+<th style="text-align: right;">Female_2016</th>
+<th style="text-align: right;">Female_2015</th>
+<th style="text-align: right;">Female_2014</th>
+<th style="text-align: right;">Female_2013</th>
+<th style="text-align: right;">Total_2012</th>
+<th style="text-align: right;">Total_2011</th>
+<th style="text-align: right;">Total_2010</th>
+<th style="text-align: right;">Male_2012</th>
+<th style="text-align: right;">Male_2011</th>
+<th style="text-align: right;">Male_2010</th>
+<th style="text-align: right;">Female_2012</th>
+<th style="text-align: right;">Female_2011</th>
+<th style="text-align: right;">Female_2010</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AL</td>
+<td style="text-align: right;">14.8</td>
+<td style="text-align: right;">16.6</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">17.8</td>
+<td style="text-align: right;">17.5</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">17.1</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">17.5</td>
+<td style="text-align: right;">13.9</td>
+<td style="text-align: right;">15.6</td>
+<td style="text-align: right;">17.5</td>
+<td style="text-align: right;">17.2</td>
+<td style="text-align: right;">17.0</td>
+<td style="text-align: right;">16.9</td>
+<td style="text-align: right;">16.4</td>
+<td style="text-align: right;">16.7</td>
+<td style="text-align: right;">16.6</td>
+<td style="text-align: right;">15.8</td>
+<td style="text-align: right;">17.7</td>
+<td style="text-align: right;">18.7</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">18.3</td>
+<td style="text-align: right;">17.8</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.4</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AM</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">16.9</td>
+<td style="text-align: right;">16.8</td>
+<td style="text-align: right;">16.3</td>
+<td style="text-align: right;">16.0</td>
+<td style="text-align: right;">16.0</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">15.3</td>
+<td style="text-align: right;">15.2</td>
+<td style="text-align: right;">14.7</td>
+<td style="text-align: right;">14.5</td>
+<td style="text-align: right;">14.5</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">17.5</td>
+<td style="text-align: right;">17.2</td>
+<td style="text-align: right;">17.2</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AT</td>
+<td style="text-align: right;">19.6</td>
+<td style="text-align: right;">19.6</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">20.1</td>
+<td style="text-align: right;">20.1</td>
+<td style="text-align: right;">20.2</td>
+<td style="text-align: right;">19.8</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">20.0</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">17.9</td>
+<td style="text-align: right;">18.7</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.2</td>
+<td style="text-align: right;">21.1</td>
+<td style="text-align: right;">21.0</td>
+<td style="text-align: right;">21.7</td>
+<td style="text-align: right;">21.6</td>
+<td style="text-align: right;">21.5</td>
+<td style="text-align: right;">21.7</td>
+<td style="text-align: right;">21.3</td>
+<td style="text-align: right;">21.8</td>
+<td style="text-align: right;">21.5</td>
+<td style="text-align: right;">19.8</td>
+<td style="text-align: right;">20.1</td>
+<td style="text-align: right;">19.8</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">17.9</td>
+<td style="text-align: right;">21.3</td>
+<td style="text-align: right;">21.7</td>
+<td style="text-align: right;">21.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AZ</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">17.4</td>
+<td style="text-align: right;">16.6</td>
+<td style="text-align: right;">16.4</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">16.3</td>
+<td style="text-align: right;">15.6</td>
+<td style="text-align: right;">15.7</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">15.6</td>
+<td style="text-align: right;">15.6</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">15.4</td>
+<td style="text-align: right;">14.5</td>
+<td style="text-align: right;">14.7</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">17.5</td>
+<td style="text-align: right;">17.2</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">17.1</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">15.3</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">15.1</td>
+<td style="text-align: right;">14.0</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">14.1</td>
+<td style="text-align: right;">16.4</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">16.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BE</td>
+<td style="text-align: right;">20.4</td>
+<td style="text-align: right;">19.3</td>
+<td style="text-align: right;">20.6</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">20.0</td>
+<td style="text-align: right;">20.3</td>
+<td style="text-align: right;">19.7</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">18.9</td>
+<td style="text-align: right;">18.6</td>
+<td style="text-align: right;">18.5</td>
+<td style="text-align: right;">18.4</td>
+<td style="text-align: right;">18.2</td>
+<td style="text-align: right;">18.4</td>
+<td style="text-align: right;">17.8</td>
+<td style="text-align: right;">22.1</td>
+<td style="text-align: right;">20.8</td>
+<td style="text-align: right;">22.1</td>
+<td style="text-align: right;">21.9</td>
+<td style="text-align: right;">21.9</td>
+<td style="text-align: right;">21.9</td>
+<td style="text-align: right;">21.5</td>
+<td style="text-align: right;">21.9</td>
+<td style="text-align: right;">21.4</td>
+<td style="text-align: right;">19.6</td>
+<td style="text-align: right;">19.9</td>
+<td style="text-align: right;">19.6</td>
+<td style="text-align: right;">17.7</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">21.3</td>
+<td style="text-align: right;">21.6</td>
+<td style="text-align: right;">21.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BG</td>
+<td style="text-align: right;">13.6</td>
+<td style="text-align: right;">15.1</td>
+<td style="text-align: right;">16.3</td>
+<td style="text-align: right;">16.2</td>
+<td style="text-align: right;">16.1</td>
+<td style="text-align: right;">16.2</td>
+<td style="text-align: right;">16.0</td>
+<td style="text-align: right;">16.0</td>
+<td style="text-align: right;">16.2</td>
+<td style="text-align: right;">11.6</td>
+<td style="text-align: right;">12.9</td>
+<td style="text-align: right;">14.2</td>
+<td style="text-align: right;">14.2</td>
+<td style="text-align: right;">14.1</td>
+<td style="text-align: right;">14.2</td>
+<td style="text-align: right;">14.0</td>
+<td style="text-align: right;">14.1</td>
+<td style="text-align: right;">14.2</td>
+<td style="text-align: right;">15.5</td>
+<td style="text-align: right;">17.1</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">17.8</td>
+<td style="text-align: right;">17.9</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">17.9</td>
+<td style="text-align: right;">15.8</td>
+<td style="text-align: right;">15.8</td>
+<td style="text-align: right;">15.6</td>
+<td style="text-align: right;">13.9</td>
+<td style="text-align: right;">14.0</td>
+<td style="text-align: right;">13.8</td>
+<td style="text-align: right;">17.3</td>
+<td style="text-align: right;">17.3</td>
+<td style="text-align: right;">17.1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb224"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb224-1"><a href="#cb224-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="fu">nrow</span>(df_1_wider_Sex_Year), <span class="fu">ncol</span>(df_1_wider_Sex_Year)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 52 37</code></pre>
+</div>
+</div>
+<p>Remarque: l’ordre des variables crées dépend de l’odre dans lequel on entre le noms des colonnes</p>
+</section>
+</section>
+<section id="transformer-des-colonnes-en-lignes---pivot_longer" class="level3" data-number="3.10.2">
+<h3 data-number="3.10.2" class="anchored" data-anchor-id="transformer-des-colonnes-en-lignes---pivot_longer"><span class="header-section-number">3.10.2</span> Transformer des colonnes en lignes - <em>pivot_longer()</em></h3>
+<p>Nous avons vu comment transformer des lignes en colonnes. Parfois, c’est l’opération inverse que nous aurons besoin d’effectuer. En effet, il est parfois préférable d’avoir une ligne par observation au lieu d’avoir toutes les informations sur la même lignes.<br> <br> Pour cela, on utilise la fonction <em>pivot_longer()</em> du package <em>tidyr</em> <br> Remarque : le nom de cette fonction vient du fait qu’on allonge le tableau en augmentant le nombre de lignes et en diminuant le nombre de colonnes <br> <br></p>
+<p>Pour l’exemple nous allons repartir du tableau <em>df_1_wider</em> créer précédemment. Et nous allons faire l’opération inverse, c’est à dire faire une ligne par sexe. <br> Pour cela, nous devons prendre les valeurs des trois variables OBS_VALUE_Total, OBS_VALUE_Male et OBS_VALUE_Female et n’en garder qu’une par ligne. Cela implique de supprimer ces variables mais d’en créé deux nouvelles : sex et OBS_VALUE</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb226"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb226-1"><a href="#cb226-1" aria-hidden="true" tabindex="-1"></a>df_1_longer <span class="ot">&lt;-</span> df_1_wider <span class="sc">%&gt;%</span> </span>
+<span id="cb226-2"><a href="#cb226-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"OBS_VALUE_Total"</span>, <span class="st">"OBS_VALUE_Male"</span>, <span class="st">"OBS_VALUE_Female"</span>),</span>
+<span id="cb226-3"><a href="#cb226-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"sex"</span>,</span>
+<span id="cb226-4"><a href="#cb226-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"OBS_VALUE"</span>)</span>
+<span id="cb226-5"><a href="#cb226-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb226-6"><a href="#cb226-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_longer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  geo   TIME_PERIOD sex              OBS_VALUE
+  &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
+1 AL           2021 OBS_VALUE_Total       14.8
+2 AL           2021 OBS_VALUE_Male        13.9
+3 AL           2021 OBS_VALUE_Female      15.8
+4 AL           2020 OBS_VALUE_Total       16.6
+5 AL           2020 OBS_VALUE_Male        15.6
+6 AL           2020 OBS_VALUE_Female      17.7</code></pre>
+</div>
+</div>
+<p><em>Remarque 1 :</em> Les valeurs prises par la variable sex sont exactement les noms des colonnes à partir desquelles nous faisons la transformation. Ici, il serait préférable de ne garder que Total, Male et Female et d’enlever le préfixe OBS_VALUE. Pour cela, on peut utiliser l’option <em>names_prefix</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb228"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb228-1"><a href="#cb228-1" aria-hidden="true" tabindex="-1"></a>df_1_longer <span class="ot">&lt;-</span> df_1_wider <span class="sc">%&gt;%</span> </span>
+<span id="cb228-2"><a href="#cb228-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"OBS_VALUE_Total"</span>, <span class="st">"OBS_VALUE_Male"</span>, <span class="st">"OBS_VALUE_Female"</span>),</span>
+<span id="cb228-3"><a href="#cb228-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"sex"</span>,</span>
+<span id="cb228-4"><a href="#cb228-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"OBS_VALUE"</span>,</span>
+<span id="cb228-5"><a href="#cb228-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">"OBS_VALUE_"</span>)</span>
+<span id="cb228-6"><a href="#cb228-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb228-7"><a href="#cb228-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_longer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  geo   TIME_PERIOD sex    OBS_VALUE
+  &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
+1 AL           2021 Total       14.8
+2 AL           2021 Male        13.9
+3 AL           2021 Female      15.8
+4 AL           2020 Total       16.6
+5 AL           2020 Male        15.6
+6 AL           2020 Female      17.7</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb230"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb230-1"><a href="#cb230-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="fu">nrow</span>(df_1_longer), <span class="fu">ncol</span>(df_1_longer)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1578    4</code></pre>
+</div>
+</div>
+<p><em>Remarque 2 :</em> Dans cette exemple nous ne transformons que 3 colonnes, entrer les noms à la main n’est donc pas trop contraignant. Parfois, nous aurons besoins de tranformer un grand nombre de colonnes et nous ne voudrons donc pas à avoir toutes les spécifier manuellement. Une façon de faire serait alors de dire que l’on veut transformer toutes les colonnes dont le nom commence d’une certaine façon. <br> <br> Dans cet exemple, on peut dire que l’on transforme toutes les colonnes qui commence par <em>OBS_VALUE_</em> avec <em>starts_with</em>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb232"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb232-1"><a href="#cb232-1" aria-hidden="true" tabindex="-1"></a>df_1_longer <span class="ot">&lt;-</span> df_1_wider <span class="sc">%&gt;%</span> </span>
+<span id="cb232-2"><a href="#cb232-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"OBS_VALUE_"</span>),</span>
+<span id="cb232-3"><a href="#cb232-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"sex"</span>,</span>
+<span id="cb232-4"><a href="#cb232-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"OBS_VALUE"</span>,</span>
+<span id="cb232-5"><a href="#cb232-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">"OBS_VALUE_"</span>)</span>
+<span id="cb232-6"><a href="#cb232-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb232-7"><a href="#cb232-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_longer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  geo   TIME_PERIOD sex    OBS_VALUE
+  &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
+1 AL           2021 Total       14.8
+2 AL           2021 Male        13.9
+3 AL           2021 Female      15.8
+4 AL           2020 Total       16.6
+5 AL           2020 Male        15.6
+6 AL           2020 Female      17.7</code></pre>
+</div>
+</div>
+<section id="transformer-plusieurs-colonnes-en-même-temps" class="level5">
+<h5 class="anchored" data-anchor-id="transformer-plusieurs-colonnes-en-même-temps">Transformer plusieurs colonnes en même temps</h5>
+<p>Nous avons parfois des bases de données dont certaines variables contiennent plus d’une information. Si on les transforme directement en lignes comme précédemment, la variable indiquant à quoi/qui correspond la valeur contiendra alors une combinaison de valeurs. <br> <br> Pour être plus explicite, si on repart du tableau <em>df_1_wider_Sex_Year</em> si on tranforme les colonnes en lignes, on aura une variable Name qui prendra en valeur les combinaisons Sexe et Année et une variable OBS_VALUE</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb234"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb234-1"><a href="#cb234-1" aria-hidden="true" tabindex="-1"></a>df_1_longer_Sex_Year <span class="ot">&lt;-</span> df_1_wider_Sex_Year <span class="sc">%&gt;%</span> </span>
+<span id="cb234-2"><a href="#cb234-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="fu">starts_with</span>(<span class="st">"Total"</span>), <span class="fu">starts_with</span>(<span class="st">"Male"</span>), <span class="fu">starts_with</span>(<span class="st">"Female"</span>)),</span>
+<span id="cb234-3"><a href="#cb234-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Sex_Year"</span>,</span>
+<span id="cb234-4"><a href="#cb234-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"OBS_VALUE"</span>)</span>
+<span id="cb234-5"><a href="#cb234-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb234-6"><a href="#cb234-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_longer_Sex_Year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  geo   Sex_Year   OBS_VALUE
+  &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
+1 AL    Total_2021      14.8
+2 AL    Total_2020      16.6
+3 AL    Total_2019      18.1
+4 AL    Total_2018      17.8
+5 AL    Total_2017      17.5
+6 AL    Total_2016      17.6</code></pre>
+</div>
+</div>
+<p>Si l’on veut faire une variable Sex et une variable Year, on utilise <em>names_pattern</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb236"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb236-1"><a href="#cb236-1" aria-hidden="true" tabindex="-1"></a>df_1_longer_Sex_Year <span class="ot">&lt;-</span> df_1_wider_Sex_Year <span class="sc">%&gt;%</span> </span>
+<span id="cb236-2"><a href="#cb236-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="fu">starts_with</span>(<span class="st">"Total"</span>), <span class="fu">starts_with</span>(<span class="st">"Male"</span>), <span class="fu">starts_with</span>(<span class="st">"Female"</span>)),</span>
+<span id="cb236-3"><a href="#cb236-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"sex"</span>,<span class="st">"year"</span>),</span>
+<span id="cb236-4"><a href="#cb236-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_pattern =</span> <span class="st">"(.*)_(.*)"</span>,</span>
+<span id="cb236-5"><a href="#cb236-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"OBS_VALUE"</span>)</span>
+<span id="cb236-6"><a href="#cb236-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb236-7"><a href="#cb236-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_1_longer_Sex_Year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  geo   sex   year  OBS_VALUE
+  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;
+1 AL    Total 2021       14.8
+2 AL    Total 2020       16.6
+3 AL    Total 2019       18.1
+4 AL    Total 2018       17.8
+5 AL    Total 2017       17.5
+6 AL    Total 2016       17.6</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb238"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb238-1"><a href="#cb238-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="fu">nrow</span>(df_1_longer_Sex_Year), <span class="fu">ncol</span>(df_1_longer_Sex_Year)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1872    4</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="travailler-sur-des-données-groupées" class="level2" data-number="3.11">
+<h2 data-number="3.11" class="anchored" data-anchor-id="travailler-sur-des-données-groupées"><span class="header-section-number">3.11</span> Travailler sur des données groupées</h2>
+<p>On peut vouloir regarder des statistiques sur des données groupées. <br> Par exemple, on s’intéresse à l’espérance de vie moyenne par sexe en Europe. Pour cela, on va devoir faire la moyenne pour les femmes, les hommes et la population totale de tous les pays</p>
+<section id="tidyverse-7" class="level3" data-number="3.11.1">
+<h3 data-number="3.11.1" class="anchored" data-anchor-id="tidyverse-7"><span class="header-section-number">3.11.1</span> Tidyverse</h3>
+</section>
+<section id="grouper-selon-une-variable" class="level3" data-number="3.11.2">
+<h3 data-number="3.11.2" class="anchored" data-anchor-id="grouper-selon-une-variable"><span class="header-section-number">3.11.2</span> Grouper selon une variable</h3>
+<p>Pour regrouper des observations selon les valeurs d’une ou plusieurs variables, on utilise la fonction <em>group_by()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb240"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb240-1"><a href="#cb240-1" aria-hidden="true" tabindex="-1"></a>df_group <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb240-2"><a href="#cb240-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb240-3"><a href="#cb240-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">meanEsp =</span> <span class="fu">mean</span>(OBS_VALUE))</span>
+<span id="cb240-4"><a href="#cb240-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb240-5"><a href="#cb240-5" aria-hidden="true" tabindex="-1"></a>df_group</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  sex   meanEsp
+  &lt;chr&gt;   &lt;dbl&gt;
+1 F        20.3
+2 M        16.9
+3 T        18.7</code></pre>
+</div>
+</div>
+<p>Si l’on veut faire cet exercice correctement, il conviendrait de ne faire la moyenne que sur les observations qui correspondent à des pays. En effet, dans le tableau, nous avons déjà certaines observations de groupe, il faudrait donc les supprimer avant de faire la moyenne</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb242"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb242-1"><a href="#cb242-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(df<span class="sc">$</span>geo) <span class="co"># indique les valeurs différentes prises par la variable geo</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "AL"        "AM"        "AT"        "AZ"        "BE"        "BG"       
+ [7] "BY"        "CH"        "CY"        "CZ"        "DE"        "DK"       
+[13] "EA19"      "EA20"      "EE"        "EL"        "ES"        "EU27_2007"
+[19] "EU27_2020" "EU28"      "FI"        "FR"        "FX"        "GE"       
+[25] "HR"        "HU"        "IE"        "IS"        "IT"        "LI"       
+[31] "LT"        "LU"        "LV"        "MD"        "ME"        "MK"       
+[37] "MT"        "NL"        "NO"        "PL"        "PT"        "RO"       
+[43] "RS"        "RU"        "SE"        "SI"        "SK"        "SM"       
+[49] "TR"        "UA"        "UK"        "XK"       </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb244"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb244-1"><a href="#cb244-1" aria-hidden="true" tabindex="-1"></a>df_group <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb244-2"><a href="#cb244-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(geo <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EA19"</span>, <span class="st">"EA20"</span>, <span class="st">"EU27_2007"</span>, <span class="st">"EU27_2020"</span>, <span class="st">"EU28"</span> ))) <span class="sc">%&gt;%</span> </span>
+<span id="cb244-3"><a href="#cb244-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb244-4"><a href="#cb244-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">meanEsp =</span> <span class="fu">mean</span>(OBS_VALUE))</span>
+<span id="cb244-5"><a href="#cb244-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb244-6"><a href="#cb244-6" aria-hidden="true" tabindex="-1"></a>df_group</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  sex   meanEsp
+  &lt;chr&gt;   &lt;dbl&gt;
+1 F        20.2
+2 M        16.8
+3 T        18.6</code></pre>
+</div>
+</div>
+<p>Il peut-être intéressant de savoir combien de données on été regroupées, pour cela on utilise <em>n()</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb246"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb246-1"><a href="#cb246-1" aria-hidden="true" tabindex="-1"></a>df_group <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb246-2"><a href="#cb246-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(geo <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EA19"</span>, <span class="st">"EA20"</span>, <span class="st">"EU27_2007"</span>, <span class="st">"EU27_2020"</span>, <span class="st">"EU28"</span> ))) <span class="sc">%&gt;%</span> </span>
+<span id="cb246-3"><a href="#cb246-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb246-4"><a href="#cb246-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">meanEsp =</span> <span class="fu">mean</span>(OBS_VALUE),</span>
+<span id="cb246-5"><a href="#cb246-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">Nb_obs =</span> <span class="fu">n</span>())</span>
+<span id="cb246-6"><a href="#cb246-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb246-7"><a href="#cb246-7" aria-hidden="true" tabindex="-1"></a>df_group</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  sex   meanEsp Nb_obs
+  &lt;chr&gt;   &lt;dbl&gt;  &lt;int&gt;
+1 F        20.2    483
+2 M        16.8    483
+3 T        18.6    483</code></pre>
+</div>
+</div>
+</section>
+<section id="grouper-selon-plusieurs-variables" class="level3" data-number="3.11.3">
+<h3 data-number="3.11.3" class="anchored" data-anchor-id="grouper-selon-plusieurs-variables"><span class="header-section-number">3.11.3</span> Grouper selon plusieurs variables</h3>
+<p>Pour regrouper les données selon plusieurs variables, il suffit de spécifier le noms de toutes les variables dans le group_by, par ordre de regroupement souhaité. <br> <br> Par exemple, si l’on souhaite avoir l’espérance de vie moyenne par pays et par sexe à 65 ans et savoir sur combien d’années la moyenne est faite dans chaque pays (nombre de valeurs d’esperance de vie par pays), on peut faire :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb248"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb248-1"><a href="#cb248-1" aria-hidden="true" tabindex="-1"></a>df_group <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb248-2"><a href="#cb248-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(geo <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"EA19"</span>, <span class="st">"EA20"</span>, <span class="st">"EU27_2007"</span>, <span class="st">"EU27_2020"</span>, <span class="st">"EU28"</span> ))) <span class="sc">%&gt;%</span> </span>
+<span id="cb248-3"><a href="#cb248-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(geo, sex) <span class="sc">%&gt;%</span> </span>
+<span id="cb248-4"><a href="#cb248-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">meanEsp =</span> <span class="fu">mean</span>(OBS_VALUE),</span>
+<span id="cb248-5"><a href="#cb248-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">Nb_Years =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'geo'. You can override using the `.groups`
+argument.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb250"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb250-1"><a href="#cb250-1" aria-hidden="true" tabindex="-1"></a>df_group</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 141 × 4
+# Groups:   geo [47]
+   geo   sex   meanEsp Nb_Years
+   &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;    &lt;int&gt;
+ 1 AL    F        18.0        9
+ 2 AL    M        16.4        9
+ 3 AL    T        17.2        9
+ 4 AM    F        17.6        5
+ 5 AM    M        14.8        5
+ 6 AM    T        16.4        5
+ 7 AT    F        21.5       12
+ 8 AT    M        18.2       12
+ 9 AT    T        20.0       12
+10 AZ    F        16.9        8
+# ℹ 131 more rows</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./0.Quelquesbases.html" class="pagination-link" aria-label="Quelques Bases">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quelques Bases</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./2.InitiationGraphiques.html" class="pagination-link" aria-label="Initiation Graphiques">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Initiation Graphiques</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

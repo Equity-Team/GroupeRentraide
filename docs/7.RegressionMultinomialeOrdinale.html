@@ -1,3 +1,2449 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:92473f6b582d5cd84a11753a7a5f940ea0408cae8e76d3c1c9a84a4e4ae6e2ce
-size 146680
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.21">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; Régressions multinomiales et ordinales – Initiation à R dans le cadre d'une recherche épidémiologique</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./8.Initiation_Fonctions_Boucles.html" rel="next">
+<link href="./6.RegressionLogistique.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea1d7ac60288e0f1efdbc993fd8432ae.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./7.RegressionMultinomialeOrdinale.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Régressions multinomiales et ordinales</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Initiation à R dans le cadre d’une recherche épidémiologique</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./0.Quelquesbases.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quelques Bases</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./1.ManipulationTableaux.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Manipulation Tableaux</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./2.InitiationGraphiques.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Initiation Graphiques</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./3.PersonalisationGraphiques.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Personnalisation graphiques avec ggplot2</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./4.PremieresAnalyses.sur.R.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Analyses Bivariées</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./5.RegressionLineaire.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Regression Lineaire</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./6.RegressionLogistique.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regression Logistique</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./7.RegressionMultinomialeOrdinale.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Régressions multinomiales et ordinales</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./8.Initiation_Fonctions_Boucles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Fonctions, conditions et boucles</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#import-des-données" id="toc-import-des-données" class="nav-link active" data-scroll-target="#import-des-données"><span class="header-section-number">9.1</span> Import des données</a></li>
+  <li><a href="#régression-polytomique-nominale-multinomiale" id="toc-régression-polytomique-nominale-multinomiale" class="nav-link" data-scroll-target="#régression-polytomique-nominale-multinomiale"><span class="header-section-number">9.2</span> Régression polytomique nominale / multinomiale</a>
+  <ul class="collapse">
+  <li><a href="#modélisation-avec-le-package-vgam" id="toc-modélisation-avec-le-package-vgam" class="nav-link" data-scroll-target="#modélisation-avec-le-package-vgam"><span class="header-section-number">9.2.1</span> Modélisation avec le package VGAM</a></li>
+  <li><a href="#les-tests" id="toc-les-tests" class="nav-link" data-scroll-target="#les-tests"><span class="header-section-number">9.2.2</span> Les tests</a></li>
+  <li><a href="#odds-ratio" id="toc-odds-ratio" class="nav-link" data-scroll-target="#odds-ratio"><span class="header-section-number">9.2.3</span> Odds-ratio</a></li>
+  <li><a href="#interprétation" id="toc-interprétation" class="nav-link" data-scroll-target="#interprétation"><span class="header-section-number">9.2.4</span> Interprétation</a></li>
+  <li><a href="#représentation-graphique-des-odds-ratio" id="toc-représentation-graphique-des-odds-ratio" class="nav-link" data-scroll-target="#représentation-graphique-des-odds-ratio"><span class="header-section-number">9.2.5</span> Représentation graphique des odds-ratio</a></li>
+  <li><a href="#package-nnet" id="toc-package-nnet" class="nav-link" data-scroll-target="#package-nnet"><span class="header-section-number">9.2.6</span> Package <em>nnet</em></a></li>
+  </ul></li>
+  <li><a href="#régression-polytomique-ordinale" id="toc-régression-polytomique-ordinale" class="nav-link" data-scroll-target="#régression-polytomique-ordinale"><span class="header-section-number">9.3</span> Régression polytomique ordinale</a>
+  <ul class="collapse">
+  <li><a href="#modèle-à-odds-proportionnels" id="toc-modèle-à-odds-proportionnels" class="nav-link" data-scroll-target="#modèle-à-odds-proportionnels"><span class="header-section-number">9.3.1</span> Modèle à odds proportionnels</a></li>
+  <li><a href="#odds-ratio-1" id="toc-odds-ratio-1" class="nav-link" data-scroll-target="#odds-ratio-1"><span class="header-section-number">9.3.2</span> Odds-ratio</a></li>
+  <li><a href="#interprétation-1" id="toc-interprétation-1" class="nav-link" data-scroll-target="#interprétation-1"><span class="header-section-number">9.3.3</span> Interprétation</a></li>
+  <li><a href="#représentation-graphique" id="toc-représentation-graphique" class="nav-link" data-scroll-target="#représentation-graphique"><span class="header-section-number">9.3.4</span> Représentation graphique</a></li>
+  <li><a href="#test-dégalité-des-pentes" id="toc-test-dégalité-des-pentes" class="nav-link" data-scroll-target="#test-dégalité-des-pentes"><span class="header-section-number">9.3.5</span> Test d’égalité des pentes</a></li>
+  <li><a href="#tests" id="toc-tests" class="nav-link" data-scroll-target="#tests"><span class="header-section-number">9.3.6</span> Tests</a></li>
+  </ul></li>
+  <li><a href="#ressources" id="toc-ressources" class="nav-link" data-scroll-target="#ressources"><span class="header-section-number">9.4</span> Ressources</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Régressions multinomiales et ordinales</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(questionr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(VGAM)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="import-des-données" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="import-des-données"><span class="header-section-number">9.1</span> Import des données</h2>
+<p>Pour cette séance, nous allons utiliser le jeu de données <em>NHANES</em> disponible dans le package du même nom.<br> <br> Il s’agit de données de santé provenant de l’enquête américaine <a href="https://wwwn.cdc.gov/nchs/nhanes/"><em>National Health and Nutrition Examination Survey (NHANES)</em></a>. Il contient des données sociale, comportementales et de santé. <br> <br> Une description des données est disponible dans le descriptif du package <a href="https://cran.r-project.org/web/packages/NHANES/NHANES.pdf">lien</a></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(NHANES)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"NHANES"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(NHANES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10000    76</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(NHANES))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 2%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 0%">
+<col style="width: 2%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">ID</th>
+<th style="text-align: left;">SurveyYr</th>
+<th style="text-align: left;">Gender</th>
+<th style="text-align: right;">Age</th>
+<th style="text-align: left;">AgeDecade</th>
+<th style="text-align: right;">AgeMonths</th>
+<th style="text-align: left;">Race1</th>
+<th style="text-align: left;">Race3</th>
+<th style="text-align: left;">Education</th>
+<th style="text-align: left;">MaritalStatus</th>
+<th style="text-align: left;">HHIncome</th>
+<th style="text-align: right;">HHIncomeMid</th>
+<th style="text-align: right;">Poverty</th>
+<th style="text-align: right;">HomeRooms</th>
+<th style="text-align: left;">HomeOwn</th>
+<th style="text-align: left;">Work</th>
+<th style="text-align: right;">Weight</th>
+<th style="text-align: right;">Length</th>
+<th style="text-align: right;">HeadCirc</th>
+<th style="text-align: right;">Height</th>
+<th style="text-align: right;">BMI</th>
+<th style="text-align: left;">BMICatUnder20yrs</th>
+<th style="text-align: left;">BMI_WHO</th>
+<th style="text-align: right;">Pulse</th>
+<th style="text-align: right;">BPSysAve</th>
+<th style="text-align: right;">BPDiaAve</th>
+<th style="text-align: right;">BPSys1</th>
+<th style="text-align: right;">BPDia1</th>
+<th style="text-align: right;">BPSys2</th>
+<th style="text-align: right;">BPDia2</th>
+<th style="text-align: right;">BPSys3</th>
+<th style="text-align: right;">BPDia3</th>
+<th style="text-align: right;">Testosterone</th>
+<th style="text-align: right;">DirectChol</th>
+<th style="text-align: right;">TotChol</th>
+<th style="text-align: right;">UrineVol1</th>
+<th style="text-align: right;">UrineFlow1</th>
+<th style="text-align: right;">UrineVol2</th>
+<th style="text-align: right;">UrineFlow2</th>
+<th style="text-align: left;">Diabetes</th>
+<th style="text-align: right;">DiabetesAge</th>
+<th style="text-align: left;">HealthGen</th>
+<th style="text-align: right;">DaysPhysHlthBad</th>
+<th style="text-align: right;">DaysMentHlthBad</th>
+<th style="text-align: left;">LittleInterest</th>
+<th style="text-align: left;">Depressed</th>
+<th style="text-align: right;">nPregnancies</th>
+<th style="text-align: right;">nBabies</th>
+<th style="text-align: right;">Age1stBaby</th>
+<th style="text-align: right;">SleepHrsNight</th>
+<th style="text-align: left;">SleepTrouble</th>
+<th style="text-align: left;">PhysActive</th>
+<th style="text-align: right;">PhysActiveDays</th>
+<th style="text-align: left;">TVHrsDay</th>
+<th style="text-align: left;">CompHrsDay</th>
+<th style="text-align: right;">TVHrsDayChild</th>
+<th style="text-align: right;">CompHrsDayChild</th>
+<th style="text-align: left;">Alcohol12PlusYr</th>
+<th style="text-align: right;">AlcoholDay</th>
+<th style="text-align: right;">AlcoholYear</th>
+<th style="text-align: left;">SmokeNow</th>
+<th style="text-align: left;">Smoke100</th>
+<th style="text-align: left;">Smoke100n</th>
+<th style="text-align: right;">SmokeAge</th>
+<th style="text-align: left;">Marijuana</th>
+<th style="text-align: right;">AgeFirstMarij</th>
+<th style="text-align: left;">RegularMarij</th>
+<th style="text-align: right;">AgeRegMarij</th>
+<th style="text-align: left;">HardDrugs</th>
+<th style="text-align: left;">SexEver</th>
+<th style="text-align: right;">SexAge</th>
+<th style="text-align: right;">SexNumPartnLife</th>
+<th style="text-align: right;">SexNumPartYear</th>
+<th style="text-align: left;">SameSex</th>
+<th style="text-align: left;">SexOrientation</th>
+<th style="text-align: left;">PregnantNow</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">51624</td>
+<td style="text-align: left;">2009_10</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: left;">30-39</td>
+<td style="text-align: right;">409</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">High School</td>
+<td style="text-align: left;">Married</td>
+<td style="text-align: left;">25000-34999</td>
+<td style="text-align: right;">30000</td>
+<td style="text-align: right;">1.36</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Own</td>
+<td style="text-align: left;">NotWorking</td>
+<td style="text-align: right;">87.4</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">164.7</td>
+<td style="text-align: right;">32.22</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">30.0_plus</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">1.29</td>
+<td style="text-align: right;">3.49</td>
+<td style="text-align: right;">352</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Good</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Most</td>
+<td style="text-align: left;">Several</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Heterosexual</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">51624</td>
+<td style="text-align: left;">2009_10</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: left;">30-39</td>
+<td style="text-align: right;">409</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">High School</td>
+<td style="text-align: left;">Married</td>
+<td style="text-align: left;">25000-34999</td>
+<td style="text-align: right;">30000</td>
+<td style="text-align: right;">1.36</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Own</td>
+<td style="text-align: left;">NotWorking</td>
+<td style="text-align: right;">87.4</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">164.7</td>
+<td style="text-align: right;">32.22</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">30.0_plus</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">1.29</td>
+<td style="text-align: right;">3.49</td>
+<td style="text-align: right;">352</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Good</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Most</td>
+<td style="text-align: left;">Several</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Heterosexual</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">51624</td>
+<td style="text-align: left;">2009_10</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: left;">30-39</td>
+<td style="text-align: right;">409</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">High School</td>
+<td style="text-align: left;">Married</td>
+<td style="text-align: left;">25000-34999</td>
+<td style="text-align: right;">30000</td>
+<td style="text-align: right;">1.36</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Own</td>
+<td style="text-align: left;">NotWorking</td>
+<td style="text-align: right;">87.4</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">164.7</td>
+<td style="text-align: right;">32.22</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">30.0_plus</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">1.29</td>
+<td style="text-align: right;">3.49</td>
+<td style="text-align: right;">352</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Good</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Most</td>
+<td style="text-align: left;">Several</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Heterosexual</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">51625</td>
+<td style="text-align: left;">2009_10</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">20000-24999</td>
+<td style="text-align: right;">22500</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">Own</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">17.0</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">105.4</td>
+<td style="text-align: right;">15.30</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">12.0_18.5</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">51630</td>
+<td style="text-align: left;">2009_10</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">40-49</td>
+<td style="text-align: right;">596</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">Some College</td>
+<td style="text-align: left;">LivePartner</td>
+<td style="text-align: left;">35000-44999</td>
+<td style="text-align: right;">40000</td>
+<td style="text-align: right;">1.91</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">Rent</td>
+<td style="text-align: left;">NotWorking</td>
+<td style="text-align: right;">86.7</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">168.4</td>
+<td style="text-align: right;">30.57</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">30.0_plus</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">108</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">1.16</td>
+<td style="text-align: right;">6.70</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">0.094</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Good</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Several</td>
+<td style="text-align: left;">Several</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Smoker</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Heterosexual</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">51638</td>
+<td style="text-align: left;">2009_10</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">0-9</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">75000-99999</td>
+<td style="text-align: right;">87500</td>
+<td style="text-align: right;">1.84</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Rent</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">29.8</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">133.1</td>
+<td style="text-align: right;">16.82</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">12.0_18.5</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">1.34</td>
+<td style="text-align: right;">4.86</td>
+<td style="text-align: right;">123</td>
+<td style="text-align: right;">1.538</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Dans ces données il semble y avoir des doublons. Nous allons les supprimer en utilisant la fonction <code>distinct()</code> de <em>dplyr</em>. Cette fonction ne garde qu’une ligne pour un groupe de lignes qui sont absolument identiques</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>NHANES <span class="ot">&lt;-</span> NHANES <span class="sc">%&gt;%</span> <span class="fu">distinct</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(NHANES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7832   76</code></pre>
+</div>
+</div>
+<p>Nous sommes passés de 10000 à 7155 observations <br> <br></p>
+<p>Résumé des données</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(NHANES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       ID           SurveyYr       Gender          Age          AgeDecade   
+ Min.   :51624   2009_10:3568   female:3943   Min.   : 0.00    0-9   :1212  
+ 1st Qu.:57388   2011_12:4264   male  :3889   1st Qu.:16.00    10-19 :1142  
+ Median :62914                                Median :35.00    30-39 :1038  
+ Mean   :62369                                Mean   :35.97    20-29 :1023  
+ 3rd Qu.:67408                                3rd Qu.:54.00    40-49 :1010  
+ Max.   :71915                                Max.   :80.00   (Other):2124  
+                                                              NA's   : 283  
+   AgeMonths          Race1           Race3               Education   
+ Min.   :  0.0   Black   :1073   Asian   : 281   8th Grade     : 397  
+ 1st Qu.:169.0   Hispanic: 538   Black   : 563   9 - 11th Grade: 712  
+ Median :387.0   Mexican : 920   Hispanic: 317   High School   :1131  
+ Mean   :403.1   White   :4626   Mexican : 451   Some College  :1695  
+ 3rd Qu.:615.0   Other   : 675   White   :2510   College Grad  :1534  
+ Max.   :959.0                   Other   : 142   NA's          :2363  
+ NA's   :4271                    NA's    :3568                        
+      MaritalStatus         HHIncome     HHIncomeMid        Poverty     
+ Divorced    : 516   more 99999 :1588   Min.   :  2500   Min.   :0.000  
+ LivePartner : 438   75000-99999: 809   1st Qu.: 22500   1st Qu.:1.130  
+ Married     :2940   25000-34999: 784   Median : 50000   Median :2.400  
+ NeverMarried:1048   35000-44999: 691   Mean   : 54862   Mean   :2.664  
+ Separated   : 148   45000-54999: 596   3rd Qu.: 87500   3rd Qu.:4.500  
+ Widowed     : 384   (Other)    :2711   Max.   :100000   Max.   :5.000  
+ NA's        :2358   NA's       : 653   NA's   :653      NA's   :578    
+   HomeRooms       HomeOwn             Work          Weight      
+ Min.   : 1.000   Own  :4845   Looking   : 244   Min.   :  2.80  
+ 1st Qu.: 5.000   Rent :2753   NotWorking:2290   1st Qu.: 54.35  
+ Median : 6.000   Other: 184   Working   :3376   Median : 71.60  
+ Mean   : 6.173   NA's :  50   NA's      :1922   Mean   : 69.67  
+ 3rd Qu.: 7.000                                  3rd Qu.: 87.90  
+ Max.   :13.000                                  Max.   :230.70  
+ NA's   :54                                      NA's   :61      
+     Length          HeadCirc         Height           BMI       
+ Min.   : 47.10   Min.   :34.20   Min.   : 83.6   Min.   :12.88  
+ 1st Qu.: 75.15   1st Qu.:39.50   1st Qu.:155.8   1st Qu.:21.40  
+ Median : 87.05   Median :41.30   Median :165.4   Median :25.83  
+ Mean   : 84.89   Mean   :41.10   Mean   :160.9   Mean   :26.52  
+ 3rd Qu.: 95.80   3rd Qu.:42.98   3rd Qu.:173.9   3rd Qu.:30.64  
+ Max.   :112.20   Max.   :45.40   Max.   :200.4   Max.   :81.25  
+ NA's   :7334     NA's   :7750    NA's   :317     NA's   :327    
+    BMICatUnder20yrs         BMI_WHO         Pulse           BPSysAve    
+ UnderWeight:  47    12.0_18.5   :1070   Min.   : 40.00   Min.   : 76.0  
+ NormWeight : 709    18.5_to_24.9:2261   1st Qu.: 66.00   1st Qu.:106.0  
+ OverWeight : 180    25.0_to_29.9:2067   Median : 72.00   Median :116.0  
+ Obese      : 197    30.0_plus   :2081   Mean   : 73.58   Mean   :118.1  
+ NA's       :6699    NA's        : 353   3rd Qu.: 82.00   3rd Qu.:127.0  
+                                         Max.   :136.00   Max.   :226.0  
+                                         NA's   :1236     NA's   :1246   
+    BPDiaAve          BPSys1         BPDia1          BPSys2     
+ Min.   :  0.00   Min.   : 72    Min.   :  0.0   Min.   : 76.0  
+ 1st Qu.: 60.00   1st Qu.:106    1st Qu.: 60.0   1st Qu.:106.0  
+ Median : 68.00   Median :116    Median : 68.0   Median :116.0  
+ Mean   : 67.03   Mean   :119    Mean   : 67.9   Mean   :118.4  
+ 3rd Qu.: 76.00   3rd Qu.:128    3rd Qu.: 76.0   3rd Qu.:128.0  
+ Max.   :116.00   Max.   :232    Max.   :118.0   Max.   :226.0  
+ NA's   :1246     NA's   :1497   NA's   :1497    NA's   :1404   
+     BPDia2           BPSys3          BPDia3        Testosterone    
+ Min.   :  0.00   Min.   : 76.0   Min.   :  0.00   Min.   :   0.25  
+ 1st Qu.: 60.00   1st Qu.:106.0   1st Qu.: 60.00   1st Qu.:  17.53  
+ Median : 68.00   Median :116.0   Median : 68.00   Median :  40.69  
+ Mean   : 67.19   Mean   :117.9   Mean   : 66.83   Mean   : 193.72  
+ 3rd Qu.: 76.00   3rd Qu.:126.0   3rd Qu.: 76.00   3rd Qu.: 352.32  
+ Max.   :118.00   Max.   :226.0   Max.   :116.00   Max.   :1795.60  
+ NA's   :1404     NA's   :1400    NA's   :1400     NA's   :4354     
+   DirectChol       TotChol         UrineVol1       UrineFlow1     
+ Min.   :0.390   Min.   : 1.530   Min.   :  0.0   Min.   : 0.0000  
+ 1st Qu.:1.090   1st Qu.: 4.060   1st Qu.: 49.0   1st Qu.: 0.3970  
+ Median :1.290   Median : 4.730   Median : 92.0   Median : 0.6820  
+ Mean   :1.359   Mean   : 4.841   Mean   :117.1   Mean   : 0.9649  
+ 3rd Qu.:1.580   3rd Qu.: 5.480   3rd Qu.:162.0   3rd Qu.: 1.2130  
+ Max.   :4.030   Max.   :13.650   Max.   :510.0   Max.   :17.1670  
+ NA's   :1296    NA's   :1296     NA's   :865     NA's   :1340     
+   UrineVol2       UrineFlow2     Diabetes     DiabetesAge        HealthGen   
+ Min.   :  0.0   Min.   : 0.000   No  :7077   Min.   : 1.00   Excellent: 661  
+ 1st Qu.: 50.0   1st Qu.: 0.482   Yes : 622   1st Qu.:40.00   Vgood    :1848  
+ Median : 92.5   Median : 0.765   NA's: 133   Median :50.00   Good     :2272  
+ Mean   :119.5   Mean   : 1.154               Mean   :49.07   Fair     : 829  
+ 3rd Qu.:171.8   3rd Qu.: 1.507               3rd Qu.:60.00   Poor     : 155  
+ Max.   :409.0   Max.   :13.692               Max.   :80.00   NA's     :2067  
+ NA's   :6670    NA's   :6671                 NA's   :7315                    
+ DaysPhysHlthBad  DaysMentHlthBad  LittleInterest   Depressed   
+ Min.   : 0.000   Min.   : 0.000   None   :3837   None   :3937  
+ 1st Qu.: 0.000   1st Qu.: 0.000   Several: 869   Several: 783  
+ Median : 0.000   Median : 0.000   Most   : 343   Most   : 331  
+ Mean   : 3.423   Mean   : 4.112   NA's   :2783   NA's   :2781  
+ 3rd Qu.: 3.000   3rd Qu.: 4.000                                
+ Max.   :30.000   Max.   :30.000                                
+ NA's   :2074     NA's   :2072                                  
+  nPregnancies       nBabies         Age1stBaby    SleepHrsNight   
+ Min.   : 1.000   Min.   : 0.000   Min.   :14.00   Min.   : 2.000  
+ 1st Qu.: 2.000   1st Qu.: 2.000   1st Qu.:19.00   1st Qu.: 6.000  
+ Median : 3.000   Median : 2.000   Median :22.00   Median : 7.000  
+ Mean   : 3.087   Mean   : 2.503   Mean   :22.48   Mean   : 6.904  
+ 3rd Qu.: 4.000   3rd Qu.: 3.000   3rd Qu.:25.00   3rd Qu.: 8.000  
+ Max.   :32.000   Max.   :12.000   Max.   :39.00   Max.   :12.000  
+ NA's   :5840     NA's   :5986     NA's   :6375    NA's   :1935    
+ SleepTrouble PhysActive  PhysActiveDays       TVHrsDay        CompHrsDay  
+ No  :4430    No  :2853   Min.   :1.000   2_hr     :1082   0_to_1_hr:1194  
+ Yes :1481    Yes :3521   1st Qu.:2.000   1_hr     : 741   0_hrs    : 953  
+ NA's:1921    NA's:1458   Median :3.000   3_hr     : 727   1_hr     : 844  
+                          Mean   :3.753   0_to_1_hr: 526   2_hr     : 491  
+                          3rd Qu.:5.000   More_4_hr: 524   3_hr     : 298  
+                          Max.   :7.000   (Other)  : 528   (Other)  : 352  
+                          NA's   :4019    NA's     :3704   NA's     :3700  
+ TVHrsDayChild   CompHrsDayChild Alcohol12PlusYr   AlcoholDay    
+ Min.   :0.000   Min.   :0.000   No  :1087       Min.   : 1.000  
+ 1st Qu.:1.000   1st Qu.:0.000   Yes :3892       1st Qu.: 1.000  
+ Median :2.000   Median :1.000   NA's:2853       Median : 2.000  
+ Mean   :1.979   Mean   :2.255                   Mean   : 2.947  
+ 3rd Qu.:3.000   3rd Qu.:6.000                   3rd Qu.: 3.000  
+ Max.   :6.000   Max.   :6.000                   Max.   :82.000  
+ NA's   :7298    NA's   :7298                    NA's   :4160    
+  AlcoholYear     SmokeNow    Smoke100         Smoke100n       SmokeAge    
+ Min.   :  0.00   No  :1307   No  :3055   Non-Smoker:3055   Min.   : 6.00  
+ 1st Qu.:  3.00   Yes :1116   Yes :2423   Smoker    :2423   1st Qu.:15.00  
+ Median : 24.00   NA's:5409   NA's:2354   NA's      :2354   Median :17.00  
+ Mean   : 73.33                                             Mean   :17.75  
+ 3rd Qu.:104.00                                             3rd Qu.:19.00  
+ Max.   :364.00                                             Max.   :72.00  
+ NA's   :3388                                               NA's   :5507   
+ Marijuana   AgeFirstMarij   RegularMarij  AgeRegMarij    HardDrugs  
+ No  :1573   Min.   : 1.00   No  :2679    Min.   : 5.00   No  :3547  
+ Yes :2096   1st Qu.:15.00   Yes : 990    1st Qu.:15.00   Yes : 764  
+ NA's:4163   Median :16.00   NA's:4163    Median :17.00   NA's:3521  
+             Mean   :17.02                Mean   :17.65              
+             3rd Qu.:18.00                3rd Qu.:19.00              
+             Max.   :48.00                Max.   :52.00              
+             NA's   :5737                 NA's   :6842               
+ SexEver         SexAge      SexNumPartnLife  SexNumPartYear   SameSex    
+ No  : 175   Min.   : 9.00   Min.   :   0.0   Min.   : 0.000   No  :4000  
+ Yes :4137   1st Qu.:15.00   1st Qu.:   2.0   1st Qu.: 1.000   Yes : 312  
+ NA's:3520   Median :17.00   Median :   5.0   Median : 1.000   NA's:3520  
+             Mean   :17.41   Mean   :  15.4   Mean   : 1.327              
+             3rd Qu.:19.00   3rd Qu.:  12.0   3rd Qu.: 1.000              
+             Max.   :50.00   Max.   :2000.0   Max.   :69.000              
+             NA's   :3699    NA's   :3552     NA's   :4172                
+      SexOrientation  PregnantNow  
+ Bisexual    :  91   Yes    :  54  
+ Heterosexual:3426   No     :1197  
+ Homosexual  :  70   Unknown:  41  
+ NA's        :4245   NA's   :6540  
+                                   
+                                   
+                                   </code></pre>
+</div>
+</div>
+</section>
+<section id="régression-polytomique-nominale-multinomiale" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="régression-polytomique-nominale-multinomiale"><span class="header-section-number">9.2</span> Régression polytomique nominale / multinomiale</h2>
+<p>Le modèle polytomique nominal, aussi appelé modèle multinomial permet de généraliser la régression logistique au cas ou <span class="math inline">\(Y\)</span> a plus de 2 modalités. Il considère qu’il n’y a pas de hiérarchies entre les différentes catégories. Ainsi, pour une modalité <span class="math inline">\(k\)</span> de Y, on modélise <span class="math display">\[logit(\mathbb{p}(Y=k)) = log \left( \frac{\mathbb{P}(Y=k | X)}{\mathbb{P}(Y=Y_{ref} | X)} \right) = \beta_{0k}+\beta_{1k}X_1 + ... + \beta_{pk}X_p\]</span> avec $Y_{ref} la modalité de référence de Y <br> Si <span class="math inline">\(Y\)</span> à <span class="math inline">\(K\)</span> modalité, cela revient à modéliser <span class="math inline">\(K-1\)</span> régressions logistiques. <br> <br></p>
+<p>Pour illustrer cette partie, nous allons éudier la variable BMI_WHO qui comporte 4 modalités correspondant à souspoids, poids normal, surpoids et obésité.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(NHANES<span class="sc">$</span>BMI_WHO, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   12.0_18.5 18.5_to_24.9 25.0_to_29.9    30.0_plus         &lt;NA&gt; 
+        1070         2261         2067         2081          353 </code></pre>
+</div>
+</div>
+<p>Comme nous faisons un modèle multinomial, nous n’allons pas considérer les catégories comme ordonnées. <br> <br> Pour les variables explicatives, nous allons prendre les mêmes que dans la séance précédente : l’âge, le sexe, l’ethnicité, le niveau d’éducation et le statut marital et le revenu. <br> <br> Comme pour la régression linéaire, il ne faut pas de données manquantes, nous allons donc travailler sur cas complet</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dataReg <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(NHANES <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(BMI_WHO,  Gender , Age, Race1, Education, MaritalStatus, HHIncomeMid)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Il n’y a pas de fonction en R base pour réaliser une régression multinomiale, il faut donc importer un package. 2 packages sont majoritairement utilisés : <br> - <em>nnet</em> avec sa fonction <code>multinial()</code> et <br> - <em>VGAM</em> avec sa fonction <code>vglm()</code> <br> Je vais ici présenter le package <em>VGAM</em></p>
+<section id="modélisation-avec-le-package-vgam" class="level3" data-number="9.2.1">
+<h3 data-number="9.2.1" class="anchored" data-anchor-id="modélisation-avec-le-package-vgam"><span class="header-section-number">9.2.1</span> Modélisation avec le package VGAM</h3>
+<p><b> Attention : </b> La fonction <em>vglm()</em> utilise la dernière catégorie comme référence</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(dataReg<span class="sc">$</span>BMI_WHO)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "12.0_18.5"    "18.5_to_24.9" "25.0_to_29.9" "30.0_plus"   </code></pre>
+</div>
+</div>
+<p>Ici 30.0_plus est utilisée comme modalité de référence <br> On peut changer la référence, par exemple “18.5_to_24.9” en réordonnant les modalités</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="fu">vglm</span>(BMI_WHO <span class="sc">~</span> Gender <span class="sc">+</span> Age <span class="sc">+</span> Race1 <span class="sc">+</span> Education <span class="sc">+</span> MaritalStatus <span class="sc">+</span> HHIncomeMid, <span class="at">data=</span>dataReg, <span class="at">family =</span> multinomial)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+vglm(formula = BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid, family = multinomial, data = dataReg)
+
+Coefficients: 
+                              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept):1               -2.213e+00  9.149e-01      NA       NA    
+(Intercept):2               -1.059e+00  2.775e-01  -3.818 0.000135 ***
+(Intercept):3               -1.230e+00  2.483e-01  -4.954 7.26e-07 ***
+Gendermale:1                -1.041e+00  2.751e-01  -3.783 0.000155 ***
+Gendermale:2                -2.041e-01  7.482e-02  -2.728 0.006373 ** 
+Gendermale:3                 3.035e-01  7.069e-02   4.294 1.76e-05 ***
+Age:1                       -1.424e-02  9.221e-03  -1.544 0.122616    
+Age:2                       -7.847e-03  2.640e-03  -2.972 0.002954 ** 
+Age:3                        4.778e-03  2.472e-03   1.933 0.053211 .  
+Race1Hispanic:1             -1.437e+01  3.703e+02      NA       NA    
+Race1Hispanic:2              3.838e-01  1.876e-01   2.046 0.040777 *  
+Race1Hispanic:3              5.488e-01  1.659e-01   3.307 0.000942 ***
+Race1Mexican:1              -5.094e-01  5.977e-01  -0.852 0.394060    
+Race1Mexican:2               3.168e-02  1.767e-01   0.179 0.857711    
+Race1Mexican:3               4.201e-01  1.502e-01   2.797 0.005151 ** 
+Race1White:1                 4.299e-01  3.335e-01   1.289 0.197328    
+Race1White:2                 8.103e-01  1.184e-01   6.844 7.71e-12 ***
+Race1White:3                 5.365e-01  1.077e-01   4.981 6.31e-07 ***
+Race1Other:1                 1.340e+00  4.551e-01   2.943 0.003246 ** 
+Race1Other:2                 1.567e+00  1.739e-01   9.009  &lt; 2e-16 ***
+Race1Other:3                 8.897e-01  1.747e-01   5.091 3.56e-07 ***
+Education9 - 11th Grade:1   -1.479e-01  7.195e-01  -0.205 0.837187    
+Education9 - 11th Grade:2    1.286e-01  1.910e-01   0.673 0.500846    
+Education9 - 11th Grade:3    1.214e-02  1.626e-01   0.075 0.940513    
+EducationHigh School:1       3.826e-01  6.534e-01   0.586 0.558169    
+EducationHigh School:2       2.488e-02  1.814e-01   0.137 0.890935    
+EducationHigh School:3      -5.283e-02  1.543e-01  -0.342 0.731998    
+EducationSome College:1     -1.660e-01  6.572e-01  -0.253 0.800552    
+EducationSome College:2     -2.447e-02  1.780e-01  -0.138 0.890630    
+EducationSome College:3     -2.843e-01  1.530e-01  -1.858 0.063202 .  
+EducationCollege Grad:1      1.844e-01  6.755e-01   0.273 0.784887    
+EducationCollege Grad:2      4.160e-01  1.857e-01   2.240 0.025069 *  
+EducationCollege Grad:3      1.144e-01  1.619e-01   0.706 0.479989    
+MaritalStatusLivePartner:1   2.856e-01  4.853e-01   0.588 0.556232    
+MaritalStatusLivePartner:2   5.630e-01  1.896e-01   2.969 0.002988 ** 
+MaritalStatusLivePartner:3   4.876e-01  1.714e-01   2.845 0.004437 ** 
+MaritalStatusMarried:1      -1.154e+00  3.920e-01  -2.945 0.003235 ** 
+MaritalStatusMarried:2       3.142e-01  1.366e-01   2.300 0.021472 *  
+MaritalStatusMarried:3       1.081e-01  1.221e-01   0.886 0.375703    
+MaritalStatusNeverMarried:1  2.607e-01  4.040e-01   0.645 0.518664    
+MaritalStatusNeverMarried:2  6.397e-01  1.564e-01   4.091 4.29e-05 ***
+MaritalStatusNeverMarried:3  1.189e-01  1.467e-01   0.811 0.417583    
+MaritalStatusSeparated:1    -2.725e-01  7.921e-01  -0.344 0.730847    
+MaritalStatusSeparated:2     4.554e-01  2.575e-01   1.768 0.077000 .  
+MaritalStatusSeparated:3    -9.038e-03  2.455e-01  -0.037 0.970634    
+MaritalStatusWidowed:1      -2.133e-01  5.510e-01  -0.387 0.698605    
+MaritalStatusWidowed:2       2.102e-01  1.999e-01   1.052 0.292851    
+MaritalStatusWidowed:3       1.764e-01  1.745e-01   1.011 0.311981    
+HHIncomeMid:1                1.703e-06  4.104e-06   0.415 0.678250    
+HHIncomeMid:2                1.683e-06  1.304e-06   1.290 0.197007    
+HHIncomeMid:3                4.228e-06  1.249e-06   3.384 0.000714 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Names of linear predictors: log(mu[,1]/mu[,4]), log(mu[,2]/mu[,4]), 
+log(mu[,3]/mu[,4])
+
+Residual deviance: 10987.81 on 14745 degrees of freedom
+
+Log-likelihood: -5493.905 on 14745 degrees of freedom
+
+Number of Fisher scoring iterations: 17 
+
+Warning: Hauck-Donner effect detected in the following estimate(s):
+'(Intercept):1', 'Race1Hispanic:1'
+
+
+Reference group is level  4  of the response</code></pre>
+</div>
+</div>
+<p><b> Attention : </b> La fonction <em>vglm()</em> utilise la dernière catégorie comme référence <br> On peut changer la référence, par exemple “18.5_to_24.9” en réordonnant spécifiant le numéro de la modalité de référence avec l’argument <code>family = multinomial(refLevel = )</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="fu">vglm</span>(BMI_WHO <span class="sc">~</span> Gender <span class="sc">+</span> Age <span class="sc">+</span> Race1 <span class="sc">+</span> Education <span class="sc">+</span> MaritalStatus <span class="sc">+</span> HHIncomeMid, <span class="at">data=</span>dataReg, <span class="at">family =</span> <span class="fu">multinomial</span>(<span class="at">refLevel =</span> <span class="dv">2</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+vglm(formula = BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid, family = multinomial(refLevel = 2), data = dataReg)
+
+Coefficients: 
+                              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept):1               -1.154e+00  9.235e-01  -1.249 0.211483    
+(Intercept):2               -1.707e-01  2.871e-01  -0.594 0.552181    
+(Intercept):3                1.059e+00  2.775e-01   3.818 0.000135 ***
+Gendermale:1                -8.365e-01  2.758e-01  -3.033 0.002419 ** 
+Gendermale:2                 5.076e-01  7.558e-02   6.716 1.86e-11 ***
+Gendermale:3                 2.041e-01  7.482e-02   2.728 0.006373 ** 
+Age:1                       -6.390e-03  9.256e-03  -0.690 0.489958    
+Age:2                        1.262e-02  2.660e-03   4.745 2.08e-06 ***
+Age:3                        7.847e-03  2.640e-03   2.972 0.002954 ** 
+Race1Hispanic:1             -1.475e+01  3.703e+02      NA       NA    
+Race1Hispanic:2              1.650e-01  1.967e-01   0.839 0.401511    
+Race1Hispanic:3             -3.838e-01  1.876e-01  -2.046 0.040777 *  
+Race1Mexican:1              -5.411e-01  6.070e-01  -0.891 0.372712    
+Race1Mexican:2               3.884e-01  1.881e-01   2.065 0.038905 *  
+Race1Mexican:3              -3.168e-02  1.767e-01  -0.179 0.857711    
+Race1White:1                -3.804e-01  3.400e-01  -1.119 0.263209    
+Race1White:2                -2.738e-01  1.300e-01  -2.107 0.035148 *  
+Race1White:3                -8.103e-01  1.184e-01  -6.844 7.71e-12 ***
+Race1Other:1                -2.276e-01  4.522e-01  -0.503 0.614753    
+Race1Other:2                -6.775e-01  1.725e-01  -3.927 8.61e-05 ***
+Race1Other:3                -1.567e+00  1.739e-01  -9.009  &lt; 2e-16 ***
+Education9 - 11th Grade:1   -2.764e-01  7.244e-01  -0.382 0.702778    
+Education9 - 11th Grade:2   -1.164e-01  1.922e-01  -0.606 0.544649    
+Education9 - 11th Grade:3   -1.286e-01  1.910e-01  -0.673 0.500846    
+EducationHigh School:1       3.577e-01  6.582e-01   0.543 0.586808    
+EducationHigh School:2      -7.771e-02  1.828e-01  -0.425 0.670732    
+EducationHigh School:3      -2.488e-02  1.814e-01  -0.137 0.890935    
+EducationSome College:1     -1.416e-01  6.615e-01  -0.214 0.830565    
+EducationSome College:2     -2.598e-01  1.800e-01  -1.443 0.148985    
+EducationSome College:3      2.447e-02  1.780e-01   0.138 0.890630    
+EducationCollege Grad:1     -2.316e-01  6.789e-01  -0.341 0.733017    
+EducationCollege Grad:2     -3.016e-01  1.852e-01  -1.629 0.103397    
+EducationCollege Grad:3     -4.160e-01  1.857e-01  -2.240 0.025069 *  
+MaritalStatusLivePartner:1  -2.774e-01  4.902e-01  -0.566 0.571389    
+MaritalStatusLivePartner:2  -7.541e-02  1.897e-01  -0.398 0.690994    
+MaritalStatusLivePartner:3  -5.630e-01  1.896e-01  -2.969 0.002988 ** 
+MaritalStatusMarried:1      -1.469e+00  3.978e-01  -3.691 0.000223 ***
+MaritalStatusMarried:2      -2.061e-01  1.426e-01  -1.445 0.148508    
+MaritalStatusMarried:3      -3.142e-01  1.366e-01  -2.300 0.021472 *  
+MaritalStatusNeverMarried:1 -3.790e-01  4.092e-01  -0.926 0.354338    
+MaritalStatusNeverMarried:2 -5.208e-01  1.636e-01  -3.183 0.001458 ** 
+MaritalStatusNeverMarried:3 -6.397e-01  1.564e-01  -4.091 4.29e-05 ***
+MaritalStatusSeparated:1    -7.279e-01  8.010e-01  -0.909 0.363513    
+MaritalStatusSeparated:2    -4.644e-01  2.777e-01  -1.672 0.094485 .  
+MaritalStatusSeparated:3    -4.554e-01  2.575e-01  -1.768 0.077000 .  
+MaritalStatusWidowed:1      -4.236e-01  5.607e-01  -0.755 0.449999    
+MaritalStatusWidowed:2      -3.381e-02  2.061e-01  -0.164 0.869713    
+MaritalStatusWidowed:3      -2.102e-01  1.999e-01  -1.052 0.292851    
+HHIncomeMid:1                1.963e-08  4.111e-06   0.005 0.996190    
+HHIncomeMid:2                2.545e-06  1.321e-06   1.926 0.054107 .  
+HHIncomeMid:3               -1.683e-06  1.304e-06  -1.290 0.197007    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Names of linear predictors: log(mu[,1]/mu[,2]), log(mu[,3]/mu[,2]), 
+log(mu[,4]/mu[,2])
+
+Residual deviance: 10987.81 on 14745 degrees of freedom
+
+Log-likelihood: -5493.905 on 14745 degrees of freedom
+
+Number of Fisher scoring iterations: 17 
+
+Warning: Hauck-Donner effect detected in the following estimate(s):
+'Race1Hispanic:1'
+
+
+Reference group is level  2  of the response</code></pre>
+</div>
+</div>
+<p><em>Remarque :</em> Il est parfois conseiller de modifier le format du dataset avant d’utiliser la fonction <em>vglm()</em></p>
+<p><img src="trt_data_reg_multinomiale_R.png" class="img-fluid"></p>
+<p>Voici comment créer ce tableau de fréquences :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>myfreq <span class="ot">&lt;-</span> dataReg <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Gender , Age, Race1, Education, MaritalStatus, HHIncomeMid) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Y0 =</span> <span class="fu">sum</span>(BMI_WHO<span class="sc">==</span><span class="st">"12.0_18.5"</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">Y1 =</span> <span class="fu">sum</span>(BMI_WHO<span class="sc">==</span><span class="st">"18.5_to_24.9"</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">Y2 =</span> <span class="fu">sum</span>(BMI_WHO<span class="sc">==</span><span class="st">"25.0_to_29.9"</span>),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">Y3 =</span> <span class="fu">sum</span>(BMI_WHO<span class="sc">==</span><span class="st">"30.0_plus"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Gender', 'Age', 'Race1', 'Education',
+'MaritalStatus'. You can override using the `.groups` argument.</code></pre>
+</div>
+</div>
+<p>En pratique, les estimations ne changent pas mais les degrés de libertés sont différents. Parfois, on peut obtenir une erreur si le dataset n’a pas ce format.</p>
+</section>
+<section id="les-tests" class="level3" data-number="9.2.2">
+<h3 data-number="9.2.2" class="anchored" data-anchor-id="les-tests"><span class="header-section-number">9.2.2</span> Les tests</h3>
+<section id="test-de-nullité-de-chaque-coefficient" class="level4">
+<h4 class="anchored" data-anchor-id="test-de-nullité-de-chaque-coefficient">Test de nullité de chaque coefficient</h4>
+<p>Dans la sortie de <em>summary()</em>, on a la p-valeur associée au test de nullité du coefficient (associé à la modalité et non pas à la variable pour les variables catégorielles).</p>
+</section>
+<section id="test-de-leffet-global-dune-variable" class="level4">
+<h4 class="anchored" data-anchor-id="test-de-leffet-global-dune-variable">Test de l’effet global d’une variable</h4>
+<p>Pour les variables continues, le test de l’effet global est le même que celui de nullité du coefficient donné dans la fonction <em>summary()</em> <br> <br> Pour les variables catégorielles, on peut tester si elle un un effet sur la probabilité d’observer Y=Yref sachant les autres variables dans le modèle avec le test de type III. On l’obtient avec la fonction <code>anova()</code> (<b> Avec un ‘a’ minuscule </b>, à ne pas confondre avec <code>Anova()</code> du package <em>car</em> utilisée pour la régression logistique. Il s’agit d’un recodage de la fonction <code>anova()</code> de base pour le package <em>VGAM</em>)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg, <span class="at">type =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table (Type III tests: each term added last)
+
+Model: 'multinomial', 'VGAMcategorical'
+
+Link: 'multilogitlink'
+
+Response: BMI_WHO
+
+              Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+Gender         3   64.555     14748      11052 6.244e-14 ***
+Age            3   24.977     14748      11013 1.561e-05 ***
+Race1         12  145.812     14757      11134 &lt; 2.2e-16 ***
+Education     12   35.762     14757      11024 0.0003538 ***
+MaritalStatus 15   51.026     14760      11039 8.174e-06 ***
+HHIncomeMid    3   11.576     14748      10999 0.0089846 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="test-de-nullité-de-tous-les-coefficients" class="level4">
+<h4 class="anchored" data-anchor-id="test-de-nullité-de-tous-les-coefficients">Test de nullité de tous les coefficients</h4>
+<p>Le test du rapport de vraissemblance permet de tester la nullité de tous les coefficients (sauf l’intercept). Il est obtenu avec la fonction <code>lrtest_vglm()</code> du package <em>VGAM</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lrtest_vglm</span>(reg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Likelihood ratio test
+
+Model 1: BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid
+Model 2: BMI_WHO ~ 1
+    #Df  LogLik Df  Chisq Pr(&gt;Chisq)    
+1 14745 -5493.9                         
+2 14793 -5701.8 48 415.84  &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="odds-ratio" class="level3" data-number="9.2.3">
+<h3 data-number="9.2.3" class="anchored" data-anchor-id="odds-ratio"><span class="header-section-number">9.2.3</span> Odds-ratio</h3>
+<p>On obtient les odds-ratio en passant à l’exponentielle les coefficients obtenus.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(reg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              (Intercept):1               (Intercept):2 
+               3.154122e-01                8.430974e-01 
+              (Intercept):3                Gendermale:1 
+               2.884927e+00                4.332054e-01 
+               Gendermale:2                Gendermale:3 
+               1.661299e+00                1.226418e+00 
+                      Age:1                       Age:2 
+               9.936304e-01                1.012705e+00 
+                      Age:3             Race1Hispanic:1 
+               1.007878e+00                3.910247e-07 
+            Race1Hispanic:2             Race1Hispanic:3 
+               1.179377e+00                6.812758e-01 
+             Race1Mexican:1              Race1Mexican:2 
+               5.820965e-01                1.474650e+00 
+             Race1Mexican:3                Race1White:1 
+               9.688126e-01                6.836143e-01 
+               Race1White:2                Race1White:3 
+               7.604954e-01                4.447414e-01 
+               Race1Other:1                Race1Other:2 
+               7.964648e-01                5.079013e-01 
+               Race1Other:3   Education9 - 11th Grade:1 
+               2.086389e-01                7.584995e-01 
+  Education9 - 11th Grade:2   Education9 - 11th Grade:3 
+               8.900998e-01                8.793622e-01 
+     EducationHigh School:1      EducationHigh School:2 
+               1.430054e+00                9.252339e-01 
+     EducationHigh School:3     EducationSome College:1 
+               9.754312e-01                8.680117e-01 
+    EducationSome College:2     EducationSome College:3 
+               7.712196e-01                1.024772e+00 
+    EducationCollege Grad:1     EducationCollege Grad:2 
+               7.932746e-01                7.396337e-01 
+    EducationCollege Grad:3  MaritalStatusLivePartner:1 
+               6.597003e-01                7.577248e-01 
+ MaritalStatusLivePartner:2  MaritalStatusLivePartner:3 
+               9.273626e-01                5.694772e-01 
+     MaritalStatusMarried:1      MaritalStatusMarried:2 
+               2.302652e-01                8.137787e-01 
+     MaritalStatusMarried:3 MaritalStatusNeverMarried:1 
+               7.303696e-01                6.845630e-01 
+MaritalStatusNeverMarried:2 MaritalStatusNeverMarried:3 
+               5.940539e-01                5.274411e-01 
+   MaritalStatusSeparated:1    MaritalStatusSeparated:2 
+               4.829409e-01                6.284936e-01 
+   MaritalStatusSeparated:3      MaritalStatusWidowed:1 
+               6.341996e-01                6.547036e-01 
+     MaritalStatusWidowed:2      MaritalStatusWidowed:3 
+               9.667559e-01                8.103986e-01 
+              HHIncomeMid:1               HHIncomeMid:2 
+               1.000000e+00                1.000003e+00 
+              HHIncomeMid:3 
+               9.999983e-01 </code></pre>
+</div>
+</div>
+<p>Pour obtenir les intervalles de confiance des odds-ratio, on passe à l’exponentielle les intervalles de confiance des coefficients. Ceux-ci peuvent être extraits en utilisant la fonction <code>confint()</code>, qui par défaut donne les IC à 95%</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(reg) <span class="co"># IC 95%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                    2.5 %        97.5 %
+(Intercept):1               -2.963845e+00  6.560948e-01
+(Intercept):2               -7.333561e-01  3.920105e-01
+(Intercept):3                5.155561e-01  1.603443e+00
+Gendermale:1                -1.377071e+00 -2.960159e-01
+Gendermale:2                 3.594726e-01  6.557269e-01
+Gendermale:3                 5.745813e-02  3.507367e-01
+Age:1                       -2.453118e-02  1.175114e-02
+Age:2                        7.410613e-03  1.783931e-02
+Age:3                        2.672820e-03  1.302060e-02
+Race1Hispanic:1             -7.406081e+02  7.110991e+02
+Race1Hispanic:2             -2.204681e-01  5.504416e-01
+Race1Hispanic:3             -7.514757e-01 -1.610050e-02
+Race1Mexican:1              -1.730897e+00  6.486589e-01
+Race1Mexican:2               1.979125e-02  7.570495e-01
+Race1Mexican:3              -3.780511e-01  3.146828e-01
+Race1White:1                -1.046673e+00  2.859497e-01
+Race1White:2                -5.285069e-01 -1.906345e-02
+Race1White:3                -1.042306e+00 -5.782188e-01
+Race1Other:1                -1.113789e+00  6.586441e-01
+Race1Other:2                -1.015608e+00 -3.393283e-01
+Race1Other:3                -1.908076e+00 -1.226224e+00
+Education9 - 11th Grade:1   -1.696219e+00  1.143393e+00
+Education9 - 11th Grade:2   -4.930863e-01  2.602428e-01
+Education9 - 11th Grade:3   -5.028673e-01  2.457506e-01
+EducationHigh School:1      -9.323422e-01  1.647766e+00
+EducationHigh School:2      -4.359548e-01  2.805375e-01
+EducationHigh School:3      -3.804409e-01  3.306896e-01
+EducationSome College:1     -1.438108e+00  1.155008e+00
+EducationSome College:2     -6.126019e-01  9.303766e-02
+EducationSome College:3     -3.243148e-01  3.732549e-01
+EducationCollege Grad:1     -1.562221e+00  1.099049e+00
+EducationCollege Grad:2     -6.645649e-01  6.136457e-02
+EducationCollege Grad:3     -7.798817e-01 -5.205756e-02
+MaritalStatusLivePartner:1  -1.238135e+00  6.832649e-01
+MaritalStatusLivePartner:2  -4.472338e-01  2.964126e-01
+MaritalStatusLivePartner:3  -9.347262e-01 -1.913468e-01
+MaritalStatusMarried:1      -2.248233e+00 -6.888147e-01
+MaritalStatusMarried:2      -4.856054e-01  7.347187e-02
+MaritalStatusMarried:3      -5.820061e-01 -4.640303e-02
+MaritalStatusNeverMarried:1 -1.180929e+00  4.229802e-01
+MaritalStatusNeverMarried:2 -8.414773e-01 -2.000932e-01
+MaritalStatusNeverMarried:3 -9.461784e-01 -3.332577e-01
+MaritalStatusSeparated:1    -2.297791e+00  8.420692e-01
+MaritalStatusSeparated:2    -1.008781e+00  7.992241e-02
+MaritalStatusSeparated:3    -9.601247e-01  4.934145e-02
+MaritalStatusWidowed:1      -1.522551e+00  6.754061e-01
+MaritalStatusWidowed:2      -4.378067e-01  3.701881e-01
+MaritalStatusWidowed:3      -6.019453e-01  1.814872e-01
+HHIncomeMid:1               -8.037426e-06  8.076686e-06
+HHIncomeMid:2               -4.490196e-08  5.134194e-06
+HHIncomeMid:3               -4.239636e-06  8.737812e-07</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(reg, <span class="at">level =</span> <span class="fl">0.99</span>) <span class="co"># IC 99%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                    0.5 %        99.5 %
+(Intercept):1               -3.532578e+00  1.224828e+00
+(Intercept):2               -9.101641e-01  5.688184e-01
+(Intercept):3                3.446366e-01  1.774363e+00
+Gendermale:1                -1.546917e+00 -1.261699e-01
+Gendermale:2                 3.129276e-01  7.022719e-01
+Gendermale:3                 1.138072e-02  3.968141e-01
+Age:1                       -3.023155e-02  1.745151e-02
+Age:2                        5.772146e-03  1.947778e-02
+Age:3                        1.047066e-03  1.464635e-02
+Race1Hispanic:1             -9.686878e+02  9.391788e+02
+Race1Hispanic:2             -3.415868e-01  6.715602e-01
+Race1Hispanic:3             -8.670115e-01  9.943531e-02
+Race1Mexican:1              -2.104753e+00  1.022514e+00
+Race1Mexican:2              -9.604041e-02  8.728812e-01
+Race1Mexican:3              -4.868875e-01  4.235192e-01
+Race1White:1                -1.256043e+00  4.953198e-01
+Race1White:2                -6.085463e-01  6.097592e-02
+Race1White:3                -1.115219e+00 -5.053054e-01
+Race1Other:1                -1.392258e+00  9.371135e-01
+Race1Other:2                -1.121859e+00 -2.330771e-01
+Race1Other:3                -2.015203e+00 -1.119097e+00
+Education9 - 11th Grade:1   -2.142355e+00  1.589529e+00
+Education9 - 11th Grade:2   -6.114428e-01  3.785994e-01
+Education9 - 11th Grade:3   -6.204837e-01  3.633670e-01
+EducationHigh School:1      -1.337707e+00  2.053131e+00
+EducationHigh School:2      -5.485239e-01  3.931065e-01
+EducationHigh School:3      -4.921676e-01  4.424163e-01
+EducationSome College:1     -1.845516e+00  1.562416e+00
+EducationSome College:2     -7.234659e-01  2.039017e-01
+EducationSome College:3     -4.339110e-01  4.828511e-01
+EducationCollege Grad:1     -1.980337e+00  1.517165e+00
+EducationCollege Grad:2     -7.786167e-01  1.754164e-01
+EducationCollege Grad:3     -8.942311e-01  6.229190e-02
+MaritalStatusLivePartner:1  -1.540009e+00  9.851387e-01
+MaritalStatusLivePartner:2  -5.640691e-01  4.132479e-01
+MaritalStatusLivePartner:3  -1.051520e+00 -7.455345e-02
+MaritalStatusMarried:1      -2.493235e+00 -4.438123e-01
+MaritalStatusMarried:2      -5.734428e-01  1.613093e-01
+MaritalStatusMarried:3      -6.661554e-01  3.774630e-02
+MaritalStatusNeverMarried:1 -1.432922e+00  6.749726e-01
+MaritalStatusNeverMarried:2 -9.422460e-01 -9.932442e-02
+MaritalStatusNeverMarried:3 -1.042475e+00 -2.369609e-01
+MaritalStatusSeparated:1    -2.791099e+00  1.335377e+00
+MaritalStatusSeparated:2    -1.179829e+00  2.509701e-01
+MaritalStatusSeparated:3    -1.118723e+00  2.079401e-01
+MaritalStatusWidowed:1      -1.867876e+00  1.020730e+00
+MaritalStatusWidowed:2      -5.647518e-01  4.971333e-01
+MaritalStatusWidowed:3      -7.250314e-01  3.045734e-01
+HHIncomeMid:1               -1.056914e-05  1.060840e-05
+HHIncomeMid:2               -8.585969e-07  5.947889e-06
+HHIncomeMid:3               -5.043012e-06  1.677157e-06</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">confint</span>(reg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                    2.5 %    97.5 %
+(Intercept):1                5.162007e-02 1.9272512
+(Intercept):2                4.802943e-01 1.4799533
+(Intercept):3                1.674569e+00 4.9701168
+Gendermale:1                 2.523165e-01 0.7437756
+Gendermale:2                 1.432574e+00 1.9265425
+Gendermale:3                 1.059141e+00 1.4201134
+Age:1                        9.757673e-01 1.0118205
+Age:2                        1.007438e+00 1.0179994
+Age:3                        1.002676e+00 1.0131057
+Race1Hispanic:1             2.272702e-322       Inf
+Race1Hispanic:2              8.021432e-01 1.7340185
+Race1Hispanic:3              4.716700e-01 0.9840284
+Race1Mexican:1               1.771254e-01 1.9129737
+Race1Mexican:2               1.019988e+00 2.1319765
+Race1Mexican:3               6.851955e-01 1.3698248
+Race1White:1                 3.511041e-01 1.3310255
+Race1White:2                 5.894844e-01 0.9811171
+Race1White:3                 3.526406e-01 0.5608965
+Race1Other:1                 3.283127e-01 1.9321707
+Race1Other:2                 3.621821e-01 0.7122486
+Race1Other:3                 1.483656e-01 0.2933983
+Education9 - 11th Grade:1    1.833755e-01 3.1373961
+Education9 - 11th Grade:2    6.107386e-01 1.2972450
+Education9 - 11th Grade:3    6.047941e-01 1.2785806
+EducationHigh School:1       3.936307e-01 5.1953614
+EducationHigh School:2       6.466470e-01 1.3238411
+EducationHigh School:3       6.835600e-01 1.3919277
+EducationSome College:1      2.373765e-01 3.1740479
+EducationSome College:2      5.419390e-01 1.0975031
+EducationSome College:3      7.230226e-01 1.4524545
+EducationCollege Grad:1      2.096699e-01 3.0013110
+EducationCollege Grad:2      5.144973e-01 1.0632865
+EducationCollege Grad:3      4.584603e-01 0.9492742
+MaritalStatusLivePartner:1   2.899244e-01 1.9803327
+MaritalStatusLivePartner:2   6.393944e-01 1.3450250
+MaritalStatusLivePartner:3   3.926934e-01 0.8258461
+MaritalStatusMarried:1       1.055856e-01 0.5021710
+MaritalStatusMarried:2       6.153246e-01 1.0762383
+MaritalStatusMarried:3       5.587763e-01 0.9546571
+MaritalStatusNeverMarried:1  3.069933e-01 1.5265040
+MaritalStatusNeverMarried:2  4.310732e-01 0.8186545
+MaritalStatusNeverMarried:3  3.882218e-01 0.7165855
+MaritalStatusSeparated:1     1.004805e-01 2.3211649
+MaritalStatusSeparated:2     3.646632e-01 1.0832030
+MaritalStatusSeparated:3     3.828451e-01 1.0505790
+MaritalStatusWidowed:1       2.181546e-01 1.9648307
+MaritalStatusWidowed:2       6.454506e-01 1.4480069
+MaritalStatusWidowed:3       5.477451e-01 1.1989992
+HHIncomeMid:1                9.999920e-01 1.0000081
+HHIncomeMid:2                1.000000e+00 1.0000051
+HHIncomeMid:3                9.999958e-01 1.0000009</code></pre>
+</div>
+</div>
+</section>
+<section id="interprétation" class="level3" data-number="9.2.4">
+<h3 data-number="9.2.4" class="anchored" data-anchor-id="interprétation"><span class="header-section-number">9.2.4</span> Interprétation</h3>
+<p>Les odds-ratio de Male2 et Male3 sont supérieurs à 1 (et les intervalles de confiance à 95% ne comprennent pas 1). Cela signifie que les hommes on une probabilité plus grande que les femmes d’être dans les catégories d’IMC 25.0_to_29.9 et 30.0_plus plutôt que dans 18.5_to_24.9.</p>
+</section>
+<section id="représentation-graphique-des-odds-ratio" class="level3" data-number="9.2.5">
+<h3 data-number="9.2.5" class="anchored" data-anchor-id="représentation-graphique-des-odds-ratio"><span class="header-section-number">9.2.5</span> Représentation graphique des odds-ratio</h3>
+<p>La fonction <code>tidy()</code> du package <em>broom</em> qui permet d’obtenir un dataset avec les coefficients et les IC n’est pas applicable à un objet créé avec <em>vglm()</em>. La fonction suivante permet d’obtenir un dataset similaire</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tidy.vglm <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">conf.int=</span><span class="cn">FALSE</span>, <span class="at">conf.level=</span><span class="fl">0.95</span>) {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    co <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">coef</span>(<span class="fu">summary</span>(x)))</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(co) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"estimate"</span>,<span class="st">"std.error"</span>,<span class="st">"statistic"</span>,<span class="st">"p.value"</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (conf.int) {</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>        qq <span class="ot">&lt;-</span> <span class="fu">qnorm</span>((<span class="dv">1</span><span class="sc">+</span>conf.level)<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>        co <span class="ot">&lt;-</span> <span class="fu">transform</span>(co,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">conf.low=</span>estimate<span class="sc">-</span>qq<span class="sc">*</span>std.error,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                        <span class="at">conf.high=</span>estimate<span class="sc">+</span>qq<span class="sc">*</span>std.error)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    co <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">term=</span><span class="fu">rownames</span>(co),co)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames</span>(co) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(co)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Cette fonction contient les coefficients en log, on va donc modifier le dataset pour avoir les odds.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>tab_summary <span class="ot">&lt;-</span> <span class="fu">tidy.vglm</span>(reg, <span class="at">conf.int =</span> T) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">estimate =</span> <span class="fu">exp</span>(estimate),</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">conf.low =</span> <span class="fu">exp</span>(conf.low),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">conf.high =</span> <span class="fu">exp</span>(conf.high))</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tab_summary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           term  estimate  std.error  statistic      p.value   conf.low
+1 (Intercept):1 0.3154122 0.92347092 -1.2494979 2.114830e-01 0.05162007
+2 (Intercept):2 0.8430974 0.28708861 -0.5944952 5.521809e-01 0.48029435
+3 (Intercept):3 2.8849274 0.27752736  3.8176407 1.347340e-04 1.67456946
+4  Gendermale:1 0.4332054 0.27578440 -3.0333238 2.418759e-03 0.25231653
+5  Gendermale:2 1.6612989 0.07557648  6.7163716 1.863054e-11 1.43257362
+6  Gendermale:3 1.2264176 0.07481734  2.7279428 6.373067e-03 1.05914092
+  conf.high
+1 1.9272512
+2 1.4799533
+3 4.9701168
+4 0.7437756
+5 1.9265425
+6 1.4201134</code></pre>
+</div>
+</div>
+<p>En utilisant <code>across()</code> pour appliquer la même fonction à plusieurs colonnes</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>tab_summary <span class="ot">&lt;-</span> <span class="fu">tidy.vglm</span>(reg, <span class="at">conf.int =</span> T) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(estimate, conf.low, conf.high), <span class="sc">~</span> <span class="fu">exp</span>(.x)))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tab_summary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           term  estimate  std.error  statistic      p.value   conf.low
+1 (Intercept):1 0.3154122 0.92347092 -1.2494979 2.114830e-01 0.05162007
+2 (Intercept):2 0.8430974 0.28708861 -0.5944952 5.521809e-01 0.48029435
+3 (Intercept):3 2.8849274 0.27752736  3.8176407 1.347340e-04 1.67456946
+4  Gendermale:1 0.4332054 0.27578440 -3.0333238 2.418759e-03 0.25231653
+5  Gendermale:2 1.6612989 0.07557648  6.7163716 1.863054e-11 1.43257362
+6  Gendermale:3 1.2264176 0.07481734  2.7279428 6.373067e-03 1.05914092
+  conf.high
+1 1.9272512
+2 1.4799533
+3 4.9701168
+4 0.7437756
+5 1.9265425
+6 1.4201134</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tab_summary, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># Ajouter les points pour les coefficients</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high), <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span>  <span class="co"># Ajouter les barres d'erreur pour les intervalles de confiance</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="co"># Ajout de la ligne des 1 </span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Coefficients"</span>, <span class="at">y =</span> <span class="st">"Estimation"</span>) <span class="sc">+</span>  </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()  <span class="co"># Utiliser un thème minimaliste</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="7.RegressionMultinomialeOrdinale_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="package-nnet" class="level3" data-number="9.2.6">
+<h3 data-number="9.2.6" class="anchored" data-anchor-id="package-nnet"><span class="header-section-number">9.2.6</span> Package <em>nnet</em></h3>
+<p>On ne va pas développer sur la modélisation avec le package <em>nnet</em> et sa fonction <code>multinom()</code>. Nous montrons juste comment l’utiliser</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnet)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>reg_bis <span class="ot">&lt;-</span> <span class="fu">multinom</span>(BMI_WHO <span class="sc">~</span> Gender <span class="sc">+</span> Age <span class="sc">+</span> Race1 <span class="sc">+</span> Education <span class="sc">+</span> MaritalStatus <span class="sc">+</span> HHIncomeMid, <span class="at">data =</span> dataReg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># weights:  72 (51 variable)
+initial  value 6837.203789 
+iter  10 value 5716.584189
+iter  20 value 5596.150853
+iter  30 value 5513.550718
+iter  40 value 5498.723498
+iter  50 value 5494.420026
+iter  60 value 5493.917196
+iter  70 value 5493.905381
+iter  70 value 5493.905353
+iter  70 value 5493.905353
+final  value 5493.905353 
+converged</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg_bis)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+multinom(formula = BMI_WHO ~ Gender + Age + Race1 + Education + 
+    MaritalStatus + HHIncomeMid, data = dataReg)
+
+Coefficients:
+             (Intercept) Gendermale         Age Race1Hispanic Race1Mexican
+18.5_to_24.9   1.1526524   0.836460 0.006399762      12.19910    0.5413734
+25.0_to_29.9   0.9819812   1.344058 0.019024571      12.36409    0.9297898
+30.0_plus      2.2121414   1.040558 0.014246524      11.81531    0.5096836
+             Race1White Race1Other Education9 - 11th Grade EducationHigh School
+18.5_to_24.9  0.3805556  0.2278622               0.2766490           -0.3574001
+25.0_to_29.9  0.1067713 -0.4496017               0.1602347           -0.4351050
+30.0_plus    -0.4297095 -1.3392899               0.1481070           -0.3822619
+             EducationSome College EducationCollege Grad
+18.5_to_24.9             0.1418673            0.23186994
+25.0_to_29.9            -0.1179104           -0.06972595
+30.0_plus                0.1663507           -0.18408587
+             MaritalStatusLivePartner MaritalStatusMarried
+18.5_to_24.9                0.2780744             1.468967
+25.0_to_29.9                0.2026586             1.262892
+30.0_plus                  -0.2849558             1.154758
+             MaritalStatusNeverMarried MaritalStatusSeparated
+18.5_to_24.9                 0.3796277              0.7293578
+25.0_to_29.9                -0.1411607              0.2649036
+30.0_plus                   -0.2600925              0.2739596
+             MaritalStatusWidowed   HHIncomeMid
+18.5_to_24.9            0.4240156 -2.293040e-08
+25.0_to_29.9            0.3901964  2.521723e-06
+30.0_plus               0.2137804 -1.705949e-06
+
+Std. Errors:
+              (Intercept)   Gendermale          Age Race1Hispanic Race1Mexican
+18.5_to_24.9 1.064880e-05 4.050036e-06 0.0007522358  6.329892e-07 8.703142e-07
+25.0_to_29.9 9.436201e-06 4.131585e-06 0.0006861739  6.500789e-07 1.068271e-06
+30.0_plus    9.525103e-06 3.809335e-06 0.0006713469  6.346448e-07 1.059728e-06
+               Race1White   Race1Other Education9 - 11th Grade
+18.5_to_24.9 6.961470e-06 6.873464e-07            2.553424e-06
+25.0_to_29.9 5.884328e-06 4.918833e-07            2.374378e-06
+30.0_plus    5.759613e-06 4.263695e-07            2.338489e-06
+             EducationHigh School EducationSome College EducationCollege Grad
+18.5_to_24.9         3.301460e-06          2.970002e-06          4.953387e-08
+25.0_to_29.9         2.964138e-06          2.317769e-06          1.971110e-07
+30.0_plus            2.965835e-06          2.553744e-06          1.787342e-07
+             MaritalStatusLivePartner MaritalStatusMarried
+18.5_to_24.9             3.720628e-07         4.705344e-06
+25.0_to_29.9             3.133170e-07         4.144233e-06
+30.0_plus                3.087044e-07         3.895121e-06
+             MaritalStatusNeverMarried MaritalStatusSeparated
+18.5_to_24.9              7.103012e-07           4.618356e-07
+25.0_to_29.9              3.798569e-07           3.582405e-07
+30.0_plus                 6.063098e-07           4.268117e-07
+             MaritalStatusWidowed  HHIncomeMid
+18.5_to_24.9         2.617475e-06 2.033373e-06
+25.0_to_29.9         2.601932e-06 2.033272e-06
+30.0_plus            2.563671e-06 2.036681e-06
+
+Residual Deviance: 10987.81 
+AIC: 11089.81 </code></pre>
+</div>
+</div>
+<p>L’avantage d’utiliser ce package est pour la représentation graphique. Le package <em>ggstats</em> qui propose des jolis graphiques notamment pour les forrest plot propose la fonction <code>ggcoef_multinom()</code> qui permet d’avoir un forrest plot des coefficients obtenus avec la fonction <em>multinom()</em>. Je n’ai pas l’impression que cette fonction puisse être utilisée sur un objet obtenu avec <em>vglm()</em>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>ggstats<span class="sc">::</span><span class="fu">ggcoef_multinom</span>(reg_bis, <span class="at">exponentiate =</span> T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ggcoef_multicomponents()` was deprecated in ggstats 0.9.0.
+ℹ Please use `ggcoef_dodged()` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="7.RegressionMultinomialeOrdinale_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="régression-polytomique-ordinale" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="régression-polytomique-ordinale"><span class="header-section-number">9.3</span> Régression polytomique ordinale</h2>
+<p>Lorsque la variable Y est catégorielles mais avec des catégories ordonnées, on peut vouloir tenir compte de cet ordre et réaliser une régression polytomique ordinale. <br> <br> Comme pour la régression multinomiale, il n’y a pas de fonction en R base, mais plusieurs packages proposent des fonctions pour réaliser une régression polytomique ordinale. Les plus couramment utilisés sont : <br> - package <em>MASS</em> avec la fonction <code>polr()</code> <br> - package <em>VGAM</em> avec la fonction <code>vglm()</code> comme pour la régression multinomiale <br> <br> Ici, nous allons présenter le package <em>VGAM</em>. La fonction <code>vglm()</code> modélise <span class="math inline">\(\mathbb{P}(Y \leq j)\)</span>. <br> <br></p>
+<p>Nous allons reprendre l’exemple de la régression multinomiale, mais en considérant cette fois-ci que les catégories de BMI sont ordonnées. Pour cet exemple, nous allons retirer la catégorie “12.0_18.5” et ainsi ne garder que les catégories “normal”, “surpoids” et “obésité”</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dataRegOrd <span class="ot">&lt;-</span> dataReg <span class="sc">%&gt;%</span> <span class="fu">filter</span>(BMI_WHO<span class="sc">!=</span><span class="st">"12.0_18.5"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Si on ne veut pas avoir de warnings, il est préférable d’indiquer à R que les catégories sont ordonnées, en utilisant la fonction <code>ordered()</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>dataRegOrd<span class="sc">$</span>BMI_WHO <span class="ot">&lt;-</span> <span class="fu">ordered</span>(dataRegOrd<span class="sc">$</span>BMI_WHO, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"18.5_to_24.9"</span>, <span class="st">"25.0_to_29.9"</span>, <span class="st">"30.0_plus"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="modèle-à-odds-proportionnels" class="level3" data-number="9.3.1">
+<h3 data-number="9.3.1" class="anchored" data-anchor-id="modèle-à-odds-proportionnels"><span class="header-section-number">9.3.1</span> Modèle à odds proportionnels</h3>
+<p>Le modèle à odds proporionnels est un modèle courrament utilisé pour tenir compte de la hiérarchie des catégories. Il s’écrit <span class="math display">\[ log\left( \frac{\mathbb{P}(Y\leq j)}{\mathbb{P}(Y&gt;j)}\right) = \beta_{0j}+\beta_1X_1 + ... + \beta_pX_p\]</span> Ce modèle fait l’hypothèse d’égalité des pentes. Si cette hypothèse n’est pas vérifiée, on fait un modèle multinomial. <br> On a un intercept par modalité de Y (sauf pour la modalité de référence), mais ensuite un seul coefficient par (modalité des variables) X. <br> Chaque <span class="math inline">\(\beta\)</span> correspond à l’augmentation du log odds d’avoir une modalité de Y inférieure ou égale à <span class="math inline">\(j\)</span> quand on a la modalité de la variable X du coefficient comparé à la modalité de référence de X (ou quand X augmente de 1 si X est continue). <br> <br> La fonction <em>vglm()</em> s’utilise comme pour la régression multinomiale, mais en changeant l’argument <em>family</em>. <br> Pour ajuster un modèle à catégories adjacentes, on utilise <code>family = cumulative(link = "logitlink", parallel = TRUE)</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>regOrd <span class="ot">&lt;-</span> <span class="fu">vglm</span>(BMI_WHO <span class="sc">~</span> Gender <span class="sc">+</span> Age <span class="sc">+</span> Race1 <span class="sc">+</span> Education <span class="sc">+</span> MaritalStatus <span class="sc">+</span> HHIncomeMid, <span class="at">data=</span>dataRegOrd, <span class="at">family =</span> <span class="fu">cumulative</span>(<span class="at">link =</span> <span class="st">"logitlink"</span>, <span class="at">parallel =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><em>Remarque :</em> parallel=T indique que l’on fait l’hypothèse d’égalité des pentes, ou odds proportionnel. Si cette hypohèse n’est pas vérifiée, on ne peut pas interpréter ce modèle (nous verrons ensuite comment tester cette hypothèse).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(regOrd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+vglm(formula = BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid, family = cumulative(link = "logitlink", parallel = TRUE), 
+    data = dataRegOrd)
+
+Coefficients: 
+                            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept):1             -1.591e+00  1.989e-01  -7.996 1.28e-15 ***
+(Intercept):2             -9.474e-02  1.976e-01  -0.479  0.63160    
+Gendermale                -1.196e-01  5.447e-02  -2.195  0.02816 *  
+Age                       -5.232e-03  1.917e-03  -2.730  0.00634 ** 
+Race1Hispanic              3.771e-01  1.334e-01   2.826  0.00471 ** 
+Race1Mexican               1.513e-01  1.230e-01   1.230  0.21877    
+Race1White                 6.617e-01  8.606e-02   7.689 1.48e-14 ***
+Race1Other                 1.233e+00  1.261e-01   9.774  &lt; 2e-16 ***
+Education9 - 11th Grade    6.766e-02  1.323e-01   0.511  0.60903    
+EducationHigh School      -2.292e-02  1.257e-01  -0.182  0.85527    
+EducationSome College     -8.710e-02  1.239e-01  -0.703  0.48218    
+EducationCollege Grad      2.540e-01  1.296e-01   1.960  0.05003 .  
+MaritalStatusLivePartner   4.235e-01  1.349e-01   3.140  0.00169 ** 
+MaritalStatusMarried       2.437e-01  9.797e-02   2.487  0.01287 *  
+MaritalStatusNeverMarried  4.804e-01  1.142e-01   4.207 2.59e-05 ***
+MaritalStatusSeparated     2.901e-01  1.908e-01   1.521  0.12838    
+MaritalStatusWidowed       1.714e-01  1.414e-01   1.212  0.22545    
+HHIncomeMid                1.392e-06  9.565e-07   1.455  0.14572    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Names of linear predictors: logitlink(P[Y&lt;=1]), logitlink(P[Y&lt;=2])
+
+Residual deviance: 10390.19 on 9694 degrees of freedom
+
+Log-likelihood: -5195.096 on 9694 degrees of freedom
+
+Number of Fisher scoring iterations: 4 
+
+No Hauck-Donner effect found in any of the estimates
+
+
+Exponentiated coefficients:
+               Gendermale                       Age             Race1Hispanic 
+                0.8873060                 0.9947816                 1.4580166 
+             Race1Mexican                Race1White                Race1Other 
+                1.1633624                 1.9381227                 3.4306750 
+  Education9 - 11th Grade      EducationHigh School     EducationSome College 
+                1.0700063                 0.9773370                 0.9165826 
+    EducationCollege Grad  MaritalStatusLivePartner      MaritalStatusMarried 
+                1.2891668                 1.5273084                 1.2759249 
+MaritalStatusNeverMarried    MaritalStatusSeparated      MaritalStatusWidowed 
+                1.6166560                 1.3366252                 1.1869143 
+              HHIncomeMid 
+                1.0000014 </code></pre>
+</div>
+</div>
+<p><em>Remarque 2 :</em> Dans cette sortie on voit bien que l’on a modélisé <span class="math inline">\(\mathbb{P}(Y \leq j)\)</span>. Il faut faire attention car certaines fonctions (notamment le package <em>MASS</em>) modélisent <span class="math inline">\(\mathbb{P}(Y &gt; j)\)</span>. Cette modélisation peut se faire en ajoutant <code>reverse=TRUE</code> dans <em>family = cumulative(link = “logitlink”, parallel = TRUE, reverse = T)</em>, mais l’interprétation des coefficients est alors différente. En effet, le coefficient de <span class="math inline">\(x\)</span> correspondra au log odds d’être dans une catégorie supérieure à <span class="math inline">\(j\)</span> et non plus au log-odds d’être dans une catégorie inférieure ou égale à <span class="math inline">\(j\)</span>. Voir (lien)[https://stats.oarc.ucla.edu/r/faq/ologit-coefficients/] pour plus de détails.</p>
+<p><br> <br> <em>Remarque 3 :</em> Comme c’est encore la fonction <em>vglm()</em>, la remarque concernant le format du dataset développée dans la partie sur la régression multinomiale s’applique.</p>
+</section>
+<section id="odds-ratio-1" class="level3" data-number="9.3.2">
+<h3 data-number="9.3.2" class="anchored" data-anchor-id="odds-ratio-1"><span class="header-section-number">9.3.2</span> Odds-ratio</h3>
+<p>Comme pour les régressions logistiques et multinomiales, on obtient les odds-ratio des coefficients et des intervalles de confiance en passant à l’exponentielle</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(regOrd))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            (Intercept):1             (Intercept):2                Gendermale 
+                0.2037869                 0.9096124                 0.8873060 
+                      Age             Race1Hispanic              Race1Mexican 
+                0.9947816                 1.4580166                 1.1633624 
+               Race1White                Race1Other   Education9 - 11th Grade 
+                1.9381227                 3.4306750                 1.0700063 
+     EducationHigh School     EducationSome College     EducationCollege Grad 
+                0.9773370                 0.9165826                 1.2891668 
+ MaritalStatusLivePartner      MaritalStatusMarried MaritalStatusNeverMarried 
+                1.5273084                 1.2759249                 1.6166560 
+   MaritalStatusSeparated      MaritalStatusWidowed               HHIncomeMid 
+                1.3366252                 1.1869143                 1.0000014 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">confint</span>(regOrd))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                              2.5 %    97.5 %
+(Intercept):1             0.1379890 0.3009596
+(Intercept):2             0.6175477 1.3398070
+Gendermale                0.7974570 0.9872782
+Age                       0.9910516 0.9985257
+Race1Hispanic             1.1225227 1.8937813
+Race1Mexican              0.9140810 1.4806261
+Race1White                1.6372975 2.2942194
+Race1Other                2.6792810 4.3927947
+Education9 - 11th Grade   0.8256102 1.3867482
+EducationHigh School      0.7639565 1.2503168
+EducationSome College     0.7189107 1.1686064
+EducationCollege Grad     0.9999709 1.6619993
+MaritalStatusLivePartner  1.1725634 1.9893772
+MaritalStatusMarried      1.0530174 1.5460184
+MaritalStatusNeverMarried 1.2924736 2.0221507
+MaritalStatusSeparated    0.9195659 1.9428373
+MaritalStatusWidowed      0.8996852 1.5658428
+HHIncomeMid               0.9999995 1.0000033</code></pre>
+</div>
+</div>
+</section>
+<section id="interprétation-1" class="level3" data-number="9.3.3">
+<h3 data-number="9.3.3" class="anchored" data-anchor-id="interprétation-1"><span class="header-section-number">9.3.3</span> Interprétation</h3>
+<p>L’odds-ratio de Male est inférieur à 1 (et son interval de confiance à 95% ne contient pas 1). Cela signifie que pour un homme, la probabilité d’être dans une catégories inférieure ou égale à j, est plus faible que pour une femme . <br> Pour un homme, l’odds d’être en IMC normal VS en surpoids ou obèse est plus faible que pour une femme de 0.89.</p>
+<p><b> Attention : </b> Normalement je ne devrais pas interpréter avant d’avoir vérifier l’égalité des pentes. Je le fais ici juste pour l’exemple, en supposant que l’hypothèse est vérifiée.</p>
+</section>
+<section id="représentation-graphique" class="level3" data-number="9.3.4">
+<h3 data-number="9.3.4" class="anchored" data-anchor-id="représentation-graphique"><span class="header-section-number">9.3.4</span> Représentation graphique</h3>
+<p>Pour obtenir un dataset avec les coefficients et leurs IC, on utilise la fonction <em>tidy.vglm()</em> définie dans la partie sur la régression multinomiale. Cette fonction contient les coefficients en log, on va donc modifier le dataset pour avoir les odds-ratio.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>tab_summary <span class="ot">&lt;-</span> <span class="fu">tidy.vglm</span>(regOrd, <span class="at">conf.int =</span> T) <span class="sc">%&gt;%</span> </span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(estimate, conf.low, conf.high), <span class="sc">~</span> <span class="fu">exp</span>(.x)))</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tab_summary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           term  estimate   std.error  statistic      p.value  conf.low
+1 (Intercept):1 0.2037869 0.198932790 -7.9960696 1.284537e-15 0.1379890
+2 (Intercept):2 0.9096124 0.197586408 -0.4794695 6.316047e-01 0.6175477
+3    Gendermale 0.8873060 0.054471389 -2.1950132 2.816265e-02 0.7974570
+4           Age 0.9947816 0.001916706 -2.7296998 6.339201e-03 0.9910516
+5 Race1Hispanic 1.4580166 0.133420044  2.8262397 4.709800e-03 1.1225227
+6  Race1Mexican 1.1633624 0.123038274  1.2298160 2.187660e-01 0.9140810
+  conf.high
+1 0.3009596
+2 1.3398070
+3 0.9872782
+4 0.9985257
+5 1.8937813
+6 1.4806261</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tab_summary, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># Ajouter les points pour les coefficients</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high), <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span>  <span class="co"># Ajouter les barres d'erreur pour les intervalles de confiance</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="co"># Ajout de la ligne des 1</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Coefficients"</span>, <span class="at">y =</span> <span class="st">"Estimation"</span>) <span class="sc">+</span>  </span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()  <span class="co"># Utiliser un thème minimaliste</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="7.RegressionMultinomialeOrdinale_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><b> Attention : </b> De même que pour l’interprétation, normalement je ne devrais pas faire le graphique avant d’avoir vérifier l’égalité des pentes. Je le fais ici juste pour l’exemple, en supposant que l’hypothèse est vérifiée.</p>
+</section>
+<section id="test-dégalité-des-pentes" class="level3" data-number="9.3.5">
+<h3 data-number="9.3.5" class="anchored" data-anchor-id="test-dégalité-des-pentes"><span class="header-section-number">9.3.5</span> Test d’égalité des pentes</h3>
+<p>Pour tester l’hypothèse d’égalité des pentes, on ajuste un modèle sans cette hypothèse <code>parallel = FALSE</code> et on compare les deux modèles. Comme il s’agit de modèles emboîtés, on peut faire un test anova.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>regOrdFALSE <span class="ot">&lt;-</span> <span class="fu">vglm</span>(BMI_WHO <span class="sc">~</span> Gender <span class="sc">+</span> Age <span class="sc">+</span> Race1 <span class="sc">+</span> Education <span class="sc">+</span> MaritalStatus <span class="sc">+</span> HHIncomeMid, <span class="at">data=</span>dataRegOrd, <span class="at">family =</span> <span class="fu">cumulative</span>(<span class="at">link =</span> <span class="st">"logitlink"</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(regOrd, regOrdFALSE, <span class="at">type =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table
+
+Model 1: BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid
+Model 2: BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid
+  Resid. Df Resid. Dev Df Deviance  Pr(&gt;Chi)    
+1      9694      10390                          
+2      9678      10278 16    112.7 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>On peut aussi faire manuellement un test du rapport de vraisemblance</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>g2.prop <span class="ot">=</span> <span class="dv">2</span><span class="sc">*</span>(<span class="fu">logLik</span>(regOrdFALSE) <span class="sc">-</span> <span class="fu">logLik</span>(regOrd))</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>df.prop <span class="ot">=</span> <span class="fu">df.residual</span>(regOrd) <span class="sc">-</span> <span class="fu">df.residual</span>(regOrdFALSE)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fu">pchisq</span>(g2.prop, df.prop)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.110223e-16</code></pre>
+</div>
+</div>
+<p>Ici on rejette l’hypothèse d’égalité des pentes et on ne peut donc pas faire un modèle à odds proportionnels.</p>
+</section>
+<section id="tests" class="level3" data-number="9.3.6">
+<h3 data-number="9.3.6" class="anchored" data-anchor-id="tests"><span class="header-section-number">9.3.6</span> Tests</h3>
+<p>Les tests de nullité globale du modèle et de significativité des variables sont les mêmes que pour la régression multinomiale. <br> <br> Nullité de tous les coefficients par le test du rapport de vraisemblance</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lrtest_vglm</span>(regOrd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Likelihood ratio test
+
+Model 1: BMI_WHO ~ Gender + Age + Race1 + Education + MaritalStatus + 
+    HHIncomeMid
+Model 2: BMI_WHO ~ 1
+   #Df  LogLik Df  Chisq Pr(&gt;Chisq)    
+1 9694 -5195.1                         
+2 9710 -5309.3 16 228.38  &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Effet global de chaque variable</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(regOrd, <span class="at">type =</span> <span class="dv">3</span>) <span class="co"># A ne pas confondre avec Anova()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table (Type III tests: each term added last)
+
+Model: 'cumulative', 'VGAMordinal', 'VGAMcategorical'
+
+Links: 'logitlink'
+
+Response: BMI_WHO
+
+              Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+Gender         1    4.800      9695      10395  0.028459 *  
+Age            1    7.425      9695      10398  0.006433 ** 
+Race1          4  123.451      9698      10514 &lt; 2.2e-16 ***
+Education      4   24.378      9698      10415 6.708e-05 ***
+MaritalStatus  5   19.732      9699      10410  0.001403 ** 
+HHIncomeMid    1    2.115      9695      10392  0.145815    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="ressources" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="ressources"><span class="header-section-number">9.4</span> Ressources</h2>
+<p><a href="https://larmarange.github.io/analyse-R/regression-logistique.html#r%C3%A9gression-logistique-ordinale">Régression logistique binaire, multinomiale et ordinale, J. Larmarange</a> <br> <br></p>
+<p><b> Régression logistique </b><br> - Le livre de joseph larmarrange Guide-R : <a href="#0">https://larmarange.github.io/guide-R/analyses/regression-logistique-binaire.html</a> <br> <br></p>
+<p><b> Modèles polytomiques nominal et ordinal </b> <br> - <a href="https://online.stat.psu.edu/stat504/lesson/8/8.5" class="uri">https://online.stat.psu.edu/stat504/lesson/8/8.5</a> <br> - <a href="https://perso.univ-rennes2.fr/system/files/users/rouviere_l/chapitre4_glm.pdf">Quelques modèles logistiques polytomiques, Laurent Rouvière</a></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./6.RegressionLogistique.html" class="pagination-link" aria-label="Regression Logistique">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Regression Logistique</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./8.Initiation_Fonctions_Boucles.html" class="pagination-link" aria-label="Fonctions, conditions et boucles">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Fonctions, conditions et boucles</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
